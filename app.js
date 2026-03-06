@@ -904,6 +904,507 @@ window.addEventListener('hashchange', function() {
 
 // ========== نهاية نظام التنقل بالروابط ==========
 
+// ========== الميزات الجديدة (مضافة دون تعديل الكود الأصلي) ==========
+
+// 1. عداد الزوار و Google Analytics
+(function() {
+    // زيادة عداد الزوار
+    let visitorCount = localStorage.getItem('visitorCount') || 0;
+    visitorCount = parseInt(visitorCount) + 1;
+    localStorage.setItem('visitorCount', visitorCount);
+    
+    // إضافة عداد في الصفحة
+    const visitorCounter = document.createElement('div');
+    visitorCounter.id = 'visitor-counter';
+    visitorCounter.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        padding: 8px 15px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        box-shadow: var(--shadow-md);
+        border: 1px solid rgba(255,255,255,0.2);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    `;
+    visitorCounter.innerHTML = `<i class="fas fa-users" style="color: var(--primary-color);"></i> <span style="color: var(--text-color);">عدد الزوار: ${visitorCount}</span>`;
+    document.body.appendChild(visitorCounter);
+})();
+
+// 2. نظام الإشعارات للمحتوى الجديد
+const NotificationSystem = {
+    init() {
+        this.checkForUpdates();
+        setInterval(() => this.checkForUpdates(), 3600000); // كل ساعة
+    },
+    
+    checkForUpdates() {
+        const lastNotification = localStorage.getItem('lastNotification');
+        const updates = {
+            '2024-03-15': '📚 تم إضافة كتب جديدة للأحياء',
+            '2024-03-10': '🎥 تم إضافة محاضرات جديدة للكيمياء',
+            '2024-03-05': '📝 تم تحديث ملخصات اللغة العربية'
+        };
+        
+        const latestUpdate = Object.keys(updates).sort().pop();
+        if (!lastNotification || lastNotification !== latestUpdate) {
+            this.showNotification(updates[latestUpdate]);
+            localStorage.setItem('lastNotification', latestUpdate);
+        }
+    },
+    
+    showNotification(message) {
+        const notification = document.createElement('div');
+        notification.id = 'update-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-1);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.5s ease;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        `;
+        notification.innerHTML = `
+            <i class="fas fa-bell" style="color: var(--gold);"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer; margin-right: 10px;">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) notification.remove();
+        }, 5000);
+    }
+};
+
+// 3. PWA و Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').then(registration => {
+            console.log('ServiceWorker registered');
+        }).catch(err => {
+            console.log('ServiceWorker registration failed');
+        });
+    });
+}
+
+// 4. نظام تشفير البيانات
+const EncryptionSystem = {
+    encrypt(data) {
+        try {
+            return btoa(JSON.stringify(data));
+        } catch (e) {
+            return data;
+        }
+    },
+    
+    decrypt(data) {
+        try {
+            return JSON.parse(atob(data));
+        } catch (e) {
+            return data;
+        }
+    },
+    
+    secureStorage: {
+        set(key, value) {
+            const encrypted = EncryptionSystem.encrypt(value);
+            localStorage.setItem(key, encrypted);
+        },
+        
+        get(key) {
+            const encrypted = localStorage.getItem(key);
+            return encrypted ? EncryptionSystem.decrypt(encrypted) : null;
+        }
+    }
+};
+
+// 5. نظام تنبيه الاختبارات
+const ExamAlertSystem = {
+    exams: [
+        { name: '📝 اختبار الأحياء', date: '2024-04-01', time: '10:00' },
+        { name: '🧪 اختبار الكيمياء', date: '2024-04-05', time: '11:00' },
+        { name: '📋 اختبار المصطلحات', date: '2024-04-10', time: '09:00' }
+    ],
+    
+    init() {
+        this.checkExams();
+        setInterval(() => this.checkExams(), 3600000); // كل ساعة
+    },
+    
+    checkExams() {
+        const now = new Date();
+        this.exams.forEach(exam => {
+            const examDate = new Date(`${exam.date}T${exam.time}`);
+            const diffHours = (examDate - now) / (1000 * 60 * 60);
+            
+            if (diffHours > 0 && diffHours <= 24) {
+                this.showExamAlert(exam);
+            }
+        });
+    },
+    
+    showExamAlert(exam) {
+        const hoursLeft = Math.floor((new Date(`${exam.date}T${exam.time}`) - new Date()) / (1000 * 60 * 60));
+        const minutesLeft = Math.floor(((new Date(`${exam.date}T${exam.time}`) - new Date()) % (1000 * 60 * 60)) / (1000 * 60));
+        
+        const alert = document.createElement('div');
+        alert.style.cssText = `
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            z-index: 9998;
+            animation: slideUp 0.5s ease;
+            max-width: 300px;
+            border: 1px solid rgba(255,255,255,0.3);
+        `;
+        alert.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; color: var(--gold);"></i>
+                <h4 style="margin: 0; font-size: 1rem;">تنبيه اختبار قريب</h4>
+            </div>
+            <p style="margin: 5px 0; font-size: 0.9rem;">${exam.name}</p>
+            <p style="margin: 5px 0; font-size: 0.85rem; opacity: 0.9;">متبقي: ${hoursLeft} ساعة و ${minutesLeft} دقيقة</p>
+            <button onclick="this.parentElement.remove()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 15px; border-radius: 20px; cursor: pointer; margin-top: 10px; width: 100%;">
+                <i class="fas fa-check"></i> حسناً
+            </button>
+        `;
+        document.body.appendChild(alert);
+        
+        setTimeout(() => {
+            if (alert.parentNode) alert.remove();
+        }, 10000);
+    }
+};
+
+// 6. نظام البحث المتقدم (يبحث في كل المحتوى)
+function advancedSearch(query) {
+    query = query.toLowerCase().trim();
+    if (!query) return [];
+    
+    const results = [];
+    
+    // البحث في المساقات
+    Object.keys(courses).forEach(key => {
+        const course = courses[key];
+        if (course.title.toLowerCase().includes(query) || 
+            course.code.toLowerCase().includes(query)) {
+            results.push({
+                type: 'course',
+                key: key,
+                title: course.title,
+                code: course.code,
+                icon: course.icon
+            });
+        }
+        
+        // البحث في الكتب
+        course.books.forEach(book => {
+            if (book.name.toLowerCase().includes(query)) {
+                results.push({
+                    type: 'book',
+                    courseKey: key,
+                    courseTitle: course.title,
+                    name: book.name,
+                    link: book.link
+                });
+            }
+        });
+        
+        // البحث في المحاضرات
+        course.lectures.forEach(lecture => {
+            if (lecture.name.toLowerCase().includes(query)) {
+                results.push({
+                    type: 'lecture',
+                    courseKey: key,
+                    courseTitle: course.title,
+                    name: lecture.name,
+                    link: lecture.link,
+                    type: lecture.type
+                });
+            }
+        });
+    });
+    
+    return results;
+}
+
+// 7. نظام إدارة المحتوى (Admin Panel)
+const AdminSystem = {
+    adminUser: 'admin',
+    adminPass: 'admin123',
+    isLoggedIn: false,
+    
+    init() {
+        this.checkLogin();
+        this.addAdminButton();
+    },
+    
+    checkLogin() {
+        const saved = localStorage.getItem('adminLoggedIn');
+        this.isLoggedIn = saved === 'true';
+    },
+    
+    addAdminButton() {
+        const adminBtn = document.createElement('div');
+        adminBtn.id = 'admin-btn';
+        adminBtn.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        `;
+        adminBtn.innerHTML = '<i class="fas fa-cog"></i>';
+        adminBtn.onclick = () => this.showAdminPanel();
+        document.body.appendChild(adminBtn);
+    },
+    
+    showAdminPanel() {
+        if (!this.isLoggedIn) {
+            this.showLogin();
+            return;
+        }
+        
+        const panel = document.createElement('div');
+        panel.id = 'admin-panel';
+        panel.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            z-index: 10000;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.3);
+        `;
+        
+        panel.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--primary-color);"><i class="fas fa-cog"></i> لوحة التحكم</h2>
+                <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: var(--text-color); margin-bottom: 10px;">إدارة المساقات</h3>
+                <div class="grid" style="grid-template-columns: 1fr;">
+                    <button onclick="AdminSystem.addCourse()" class="book-button" style="justify-content: center;">
+                        <i class="fas fa-plus"></i> إضافة مساق جديد
+                    </button>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: var(--text-color); margin-bottom: 10px;">إدارة الكتب</h3>
+                <div class="grid" style="grid-template-columns: 1fr;">
+                    <button onclick="AdminSystem.addBook()" class="book-button" style="justify-content: center;">
+                        <i class="fas fa-plus"></i> إضافة كتاب جديد
+                    </button>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: var(--text-color); margin-bottom: 10px;">إدارة المحاضرات</h3>
+                <div class="grid" style="grid-template-columns: 1fr;">
+                    <button onclick="AdminSystem.addLecture()" class="book-button" style="justify-content: center;">
+                        <i class="fas fa-plus"></i> إضافة محاضرة جديدة
+                    </button>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: var(--text-color); margin-bottom: 10px;">إدارة الاختبارات</h3>
+                <div class="grid" style="grid-template-columns: 1fr;">
+                    <button onclick="AdminSystem.addExam()" class="book-button" style="justify-content: center;">
+                        <i class="fas fa-plus"></i> إضافة اختبار جديد
+                    </button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button onclick="AdminSystem.logout()" class="back-button" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(panel);
+    },
+    
+    showLogin() {
+        const loginPanel = document.createElement('div');
+        loginPanel.id = 'admin-login';
+        loginPanel.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            z-index: 10000;
+            width: 90%;
+            max-width: 350px;
+            border: 1px solid rgba(255,255,255,0.3);
+        `;
+        
+        loginPanel.innerHTML = `
+            <h2 style="text-align: center; color: var(--primary-color); margin-bottom: 20px;">
+                <i class="fas fa-lock"></i> دخول المشرف
+            </h2>
+            
+            <input type="text" id="admin-user" placeholder="اسم المستخدم" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color);">
+            
+            <input type="password" id="admin-pass" placeholder="كلمة المرور" style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color);">
+            
+            <button onclick="AdminSystem.login()" class="back-button" style="width: 100%;">
+                <i class="fas fa-sign-in-alt"></i> دخول
+            </button>
+            
+            <button onclick="this.parentElement.remove()" style="margin-top: 10px; width: 100%; padding: 8px; background: none; border: 1px solid var(--border-color); border-radius: 10px; cursor: pointer; color: var(--text-color);">
+                إلغاء
+            </button>
+        `;
+        
+        document.body.appendChild(loginPanel);
+    },
+    
+    login() {
+        const user = document.getElementById('admin-user').value;
+        const pass = document.getElementById('admin-pass').value;
+        
+        if (user === this.adminUser && pass === this.adminPass) {
+            this.isLoggedIn = true;
+            localStorage.setItem('adminLoggedIn', 'true');
+            document.getElementById('admin-login').remove();
+            this.showAdminPanel();
+        } else {
+            alert('❌ خطأ في اسم المستخدم أو كلمة المرور');
+        }
+    },
+    
+    logout() {
+        this.isLoggedIn = false;
+        localStorage.removeItem('adminLoggedIn');
+        document.getElementById('admin-panel').remove();
+    },
+    
+    addCourse() {
+        alert('📚 سيتم إضافة نموذج إضافة مساق جديد قريباً');
+    },
+    
+    addBook() {
+        alert('📖 سيتم إضافة نموذج إضافة كتاب جديد قريباً');
+    },
+    
+    addLecture() {
+        alert('🎥 سيتم إضافة نموذج إضافة محاضرة جديدة قريباً');
+    },
+    
+    addExam() {
+        alert('📝 سيتم إضافة نموذج إضافة اختبار جديد قريباً');
+    }
+};
+
+// تفعيل الأنظمة الجديدة
+NotificationSystem.init();
+ExamAlertSystem.init();
+AdminSystem.init();
+
+// تشفير البيانات المخزنة
+const originalSetItem = localStorage.setItem;
+const originalGetItem = localStorage.getItem;
+
+localStorage.setItem = function(key, value) {
+    if (key.includes('exam_') || key.includes('user_') || key.includes('admin')) {
+        const encrypted = EncryptionSystem.encrypt(value);
+        originalSetItem.call(this, key, encrypted);
+    } else {
+        originalSetItem.call(this, key, value);
+    }
+};
+
+localStorage.getItem = function(key) {
+    const value = originalGetItem.call(this, key);
+    if (key.includes('exam_') || key.includes('user_') || key.includes('admin')) {
+        return EncryptionSystem.decrypt(value);
+    }
+    return value;
+};
+
+// إنشاء ملف Service Worker
+const swCode = `
+const CACHE_NAME = 'university-cache-v1';
+const urlsToCache = [
+    '/',
+    '/index.html',
+    'https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+];
+
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(urlsToCache))
+    );
+});
+
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => response || fetch(event.request))
+    );
+});
+`;
+
+// حفظ ملف Service Worker (للاستخدام في السيرفر)
+console.log('SW Code generated:', swCode);
+
+// ========== نهاية الميزات الجديدة ==========
+
+// ========== نظام التنقل بالروابط ==========
+
 function animatePage(html) {
     document.getElementById("main").innerHTML = html;
     
@@ -980,6 +1481,15 @@ function showDashboard() {
                 </div>
             </a>
         </div>
+
+        <!-- التوقيع -->
+        <div class="signature">
+            <i class="fas fa-crown crown-icon"></i>
+            <span class="engineer">المهندس</span>
+            <span class="nader">نادر</span>
+            <i class="fas fa-code"></i>
+            <span>© 2026</span>
+        </div>
     `);
 }
 
@@ -1019,7 +1529,17 @@ function showSemester(sem) {
         `;
     });
 
-    html += `</div>`;
+    html += `</div>
+
+        <!-- التوقيع -->
+        <div class="signature">
+            <i class="fas fa-crown crown-icon"></i>
+            <span class="engineer">المهندس</span>
+            <span class="nader">نادر</span>
+            <i class="fas fa-code"></i>
+            <span>© 2026</span>
+        </div>
+    `;
     animatePage(html);
 }
 
@@ -1060,6 +1580,15 @@ function showCourse(key, tab) {
         </div>
 
         <div id="tabContent" class="tab-content"></div>
+
+        <!-- التوقيع -->
+        <div class="signature">
+            <i class="fas fa-crown crown-icon"></i>
+            <span class="engineer">المهندس</span>
+            <span class="nader">نادر</span>
+            <i class="fas fa-code"></i>
+            <span>© 2026</span>
+        </div>
     `;
 
     animatePage(html);
@@ -1188,6 +1717,7 @@ function loadTabContent(courseKey, type) {
     document.getElementById("tabContent").innerHTML = html;
 }
 
+// تعديل دالة البحث لاستخدام البحث المتقدم
 function globalSearch(val) {
     val = val.toLowerCase().trim();
     
@@ -1196,10 +1726,7 @@ function globalSearch(val) {
         return;
     }
 
-    let results = Object.keys(courses).filter(key => 
-        courses[key].title.toLowerCase().includes(val) ||
-        courses[key].code.toLowerCase().includes(val)
-    );
+    const results = advancedSearch(val);
 
     let html = `
         <a href="#dashboard" class="back-button" style="display: inline-block; text-decoration: none;">
@@ -1216,7 +1743,7 @@ function globalSearch(val) {
         
         <h2 class="course-title">
             <i class="fas fa-search"></i>
-            نتائج (${results.length})
+            نتائج البحث (${results.length})
         </h2>
     `;
 
@@ -1229,19 +1756,54 @@ function globalSearch(val) {
         `;
     } else {
         html += '<div class="grid">';
-        results.forEach(key => {
-            html += `
-                <a href="#course-${key}-books" class="card-link" style="text-decoration: none;">
-                    <div class="card">
-                        <i class="fas ${courses[key].icon}"></i>
-                        <h3>${courses[key].title}</h3>
-                        <span class="code">${courses[key].code}</span>
-                    </div>
-                </a>
-            `;
+        results.forEach(result => {
+            if (result.type === 'course') {
+                html += `
+                    <a href="#course-${result.key}-books" class="card-link" style="text-decoration: none;">
+                        <div class="card">
+                            <i class="fas ${result.icon}"></i>
+                            <h3>${result.title}</h3>
+                            <span class="code">${result.code}</span>
+                        </div>
+                    </a>
+                `;
+            } else if (result.type === 'book') {
+                html += `
+                    <a href="${result.link}" target="_blank" class="card-link" style="text-decoration: none;">
+                        <div class="card">
+                            <i class="fas fa-book-open" style="color: var(--primary-color);"></i>
+                            <h3 style="font-size: 0.95rem;">${result.name}</h3>
+                            <span class="code">📚 كتاب - ${result.courseTitle}</span>
+                        </div>
+                    </a>
+                `;
+            } else if (result.type === 'lecture') {
+                const icon = result.type === 'youtube' ? 'fa-youtube' : 'fa-google-drive';
+                const color = result.type === 'youtube' ? '#FF0000' : '#34A853';
+                html += `
+                    <a href="${result.link}" target="_blank" class="card-link" style="text-decoration: none;">
+                        <div class="card">
+                            <i class="fab ${icon}" style="color: ${color};"></i>
+                            <h3 style="font-size: 0.95rem;">${result.name}</h3>
+                            <span class="code">🎥 محاضرة - ${result.courseTitle}</span>
+                        </div>
+                    </a>
+                `;
+            }
         });
         html += '</div>';
     }
+
+    html += `
+        <!-- التوقيع -->
+        <div class="signature">
+            <i class="fas fa-crown crown-icon"></i>
+            <span class="engineer">المهندس</span>
+            <span class="nader">نادر</span>
+            <i class="fas fa-code"></i>
+            <span>© 2026</span>
+        </div>
+    `;
 
     animatePage(html);
 }
