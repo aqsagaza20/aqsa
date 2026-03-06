@@ -620,7 +620,7 @@ style.textContent = `
         color: var(--text-light);
     }
     
-    /* ===== التوقيع الأصلي المعدل (بسيط وأنيق) ===== */
+    /* ===== التوقيع الأصلي (بسيط وأنيق) - المعدل ===== */
     .signature {
         text-align: center;
         margin-top: 40px;
@@ -1099,7 +1099,7 @@ const ExamAlertSystem = {
     }
 };
 
-// 6. نظام البحث المتقدم (يبحث في كل المحتوى)
+// 6. نظام البحث المتقدم والشامل (يبحث في كل المحتوى)
 function advancedSearch(query) {
     query = query.toLowerCase().trim();
     if (!query) return [];
@@ -1116,7 +1116,8 @@ function advancedSearch(query) {
                 key: key,
                 title: course.title,
                 code: course.code,
-                icon: course.icon
+                icon: course.icon,
+                category: 'مساق'
             });
         }
         
@@ -1128,7 +1129,8 @@ function advancedSearch(query) {
                     courseKey: key,
                     courseTitle: course.title,
                     name: book.name,
-                    link: book.link
+                    link: book.link,
+                    category: 'كتاب'
                 });
             }
         });
@@ -1142,10 +1144,30 @@ function advancedSearch(query) {
                     courseTitle: course.title,
                     name: lecture.name,
                     link: lecture.link,
-                    type: lecture.type
+                    lectureType: lecture.type,
+                    category: 'محاضرة'
                 });
             }
         });
+    });
+    
+    // البحث في الملخصات (بيانات وهمية للتجربة)
+    const summaries = [
+        { name: 'ملخص الأحياء الفصل الأول', course: 'biology' },
+        { name: 'ملخص الكيمياء العضوية', course: 'chemistry' },
+        { name: 'ملخص المصطلحات الطبية', course: 'med_terms' }
+    ];
+    
+    summaries.forEach(summary => {
+        if (summary.name.toLowerCase().includes(query)) {
+            results.push({
+                type: 'summary',
+                name: summary.name,
+                courseKey: summary.course,
+                courseTitle: courses[summary.course]?.title || 'مساق',
+                category: 'ملخص'
+            });
+        }
     });
     
     return results;
@@ -1482,7 +1504,7 @@ function showDashboard() {
             </a>
         </div>
 
-        <!-- التوقيع -->
+        <!-- التوقيع الأصلي فقط (بدون تكرار) -->
         <div class="signature">
             <i class="fas fa-crown crown-icon"></i>
             <span class="engineer">المهندس</span>
@@ -1531,7 +1553,7 @@ function showSemester(sem) {
 
     html += `</div>
 
-        <!-- التوقيع -->
+        <!-- التوقيع الأصلي فقط (بدون تكرار) -->
         <div class="signature">
             <i class="fas fa-crown crown-icon"></i>
             <span class="engineer">المهندس</span>
@@ -1581,7 +1603,7 @@ function showCourse(key, tab) {
 
         <div id="tabContent" class="tab-content"></div>
 
-        <!-- التوقيع -->
+        <!-- التوقيع الأصلي فقط (بدون تكرار) -->
         <div class="signature">
             <i class="fas fa-crown crown-icon"></i>
             <span class="engineer">المهندس</span>
@@ -1717,7 +1739,7 @@ function loadTabContent(courseKey, type) {
     document.getElementById("tabContent").innerHTML = html;
 }
 
-// تعديل دالة البحث لاستخدام البحث المتقدم
+// تعديل دالة البحث لاستخدام البحث المتقدم والشامل مع عرض النتائج
 function globalSearch(val) {
     val = val.toLowerCase().trim();
     
@@ -1743,7 +1765,7 @@ function globalSearch(val) {
         
         <h2 class="course-title">
             <i class="fas fa-search"></i>
-            نتائج البحث (${results.length})
+            نتائج البحث عن "${val}" (${results.length})
         </h2>
     `;
 
@@ -1752,6 +1774,7 @@ function globalSearch(val) {
             <div class="card" style="text-align: center; padding: 30px;">
                 <i class="fas fa-frown" style="font-size: 2rem;"></i>
                 <h3>لا توجد نتائج</h3>
+                <p style="color: var(--text-light); margin-top: 10px;">جرب كلمات بحث أخرى</p>
             </div>
         `;
     } else {
@@ -1761,9 +1784,9 @@ function globalSearch(val) {
                 html += `
                     <a href="#course-${result.key}-books" class="card-link" style="text-decoration: none;">
                         <div class="card">
-                            <i class="fas ${result.icon}"></i>
+                            <i class="fas ${result.icon}" style="color: var(--primary-color);"></i>
                             <h3>${result.title}</h3>
-                            <span class="code">${result.code}</span>
+                            <span class="code">📚 ${result.category} - ${result.code}</span>
                         </div>
                     </a>
                 `;
@@ -1773,21 +1796,29 @@ function globalSearch(val) {
                         <div class="card">
                             <i class="fas fa-book-open" style="color: var(--primary-color);"></i>
                             <h3 style="font-size: 0.95rem;">${result.name}</h3>
-                            <span class="code">📚 كتاب - ${result.courseTitle}</span>
+                            <span class="code">📖 ${result.category} - ${result.courseTitle}</span>
                         </div>
                     </a>
                 `;
             } else if (result.type === 'lecture') {
-                const icon = result.type === 'youtube' ? 'fa-youtube' : 'fa-google-drive';
-                const color = result.type === 'youtube' ? '#FF0000' : '#34A853';
+                const icon = result.lectureType === 'youtube' ? 'fa-youtube' : 'fa-google-drive';
+                const color = result.lectureType === 'youtube' ? '#FF0000' : '#34A853';
                 html += `
                     <a href="${result.link}" target="_blank" class="card-link" style="text-decoration: none;">
                         <div class="card">
                             <i class="fab ${icon}" style="color: ${color};"></i>
                             <h3 style="font-size: 0.95rem;">${result.name}</h3>
-                            <span class="code">🎥 محاضرة - ${result.courseTitle}</span>
+                            <span class="code">🎥 ${result.category} - ${result.courseTitle}</span>
                         </div>
                     </a>
+                `;
+            } else if (result.type === 'summary') {
+                html += `
+                    <div class="card" onclick="alert('📝 سيتم فتح الملخص قريباً')" style="cursor: pointer;">
+                        <i class="fas fa-file-alt" style="color: var(--primary-color);"></i>
+                        <h3 style="font-size: 0.95rem;">${result.name}</h3>
+                        <span class="code">📝 ${result.category} - ${result.courseTitle}</span>
+                    </div>
                 `;
             }
         });
@@ -1795,7 +1826,7 @@ function globalSearch(val) {
     }
 
     html += `
-        <!-- التوقيع -->
+        <!-- التوقيع الأصلي فقط (بدون تكرار) -->
         <div class="signature">
             <i class="fas fa-crown crown-icon"></i>
             <span class="engineer">المهندس</span>
