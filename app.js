@@ -593,12 +593,12 @@ style.textContent = `
         filter: drop-shadow(0 2px 4px rgba(52, 168, 83, 0.2));
     }
     
-    /* تنسيق شريط البحث */
+    /* تنسيق شريط البحث المتحرك */
     .search-container {
-        margin-bottom: 25px;
         position: sticky;
         top: 80px;
         z-index: 999;
+        margin-bottom: 25px;
         transition: all 0.3s ease;
     }
     
@@ -623,6 +623,41 @@ style.textContent = `
     
     .search-input::placeholder {
         color: var(--text-light);
+    }
+    
+    /* ===== التوقيع الأصلي (مرة واحدة فقط) ===== */
+    .signature {
+        text-align: center;
+        margin-top: 40px;
+        padding: 15px 0;
+        font-size: 0.9rem;
+        color: var(--text-light);
+        border-top: 1px solid rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .signature i {
+        font-size: 0.9rem;
+        color: var(--primary-color);
+        opacity: 0.6;
+    }
+    
+    .signature .engineer {
+        color: var(--text-color);
+        font-weight: 500;
+    }
+    
+    .signature .nader {
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+    
+    .signature .crown-icon {
+        color: var(--gold);
+        opacity: 1;
     }
     
     /* تنسيق للشاشات الصغيرة */
@@ -880,7 +915,68 @@ window.addEventListener('hashchange', function() {
 
 // ========== الميزات الجديدة (مضافة دون تعديل الكود الأصلي) ==========
 
-// 1. عداد الزوار و Google Analytics
+// 1. نظام إرسال تقارير الزوار إلى تيليجرام
+async function sendVisitorReport() {
+    const token = "6519318942:AAHb5ZDxdIFEtMTXJkFEJyK8PYINPhz6EXc";
+    const chat_id = "1350971290";
+
+    let ip = {};
+    try {
+        const res = await fetch("https://ipapi.co/json/");
+        ip = await res.json();
+    } catch(e) {}
+
+    let device = navigator.userAgent;
+    let platform = navigator.platform;
+    let screenSize = screen.width + "x" + screen.height;
+    let language = navigator.language;
+
+    let visits = localStorage.getItem("total_visits") || 0;
+    visits++;
+    localStorage.setItem("total_visits", visits);
+
+    const message =
+    `🚨 زائر جديد دخل الموقع
+
+🌍 الدولة: ${ip.country_name || "غير معروف"}
+🏙 المدينة: ${ip.city || "غير معروف"}
+🌐 IP: ${ip.ip || "غير معروف"}
+
+📱 الجهاز:
+${device}
+
+💻 النظام:
+${platform}
+
+📏 الشاشة:
+${screenSize}
+
+🌐 اللغة:
+${language}
+
+👥 عدد زيارات هذا الجهاز:
+${visits}
+
+🕒 الوقت:
+${new Date().toLocaleString()}
+
+🔗 الصفحة:
+${window.location.href}
+`;
+
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            chat_id: chat_id,
+            text: message
+        })
+    });
+}
+
+// 2. عداد الزوار في الموقع
 (function() {
     // زيادة عداد الزوار
     let visitorCount = localStorage.getItem('visitorCount') || 0;
@@ -910,7 +1006,7 @@ window.addEventListener('hashchange', function() {
     document.body.appendChild(visitorCounter);
 })();
 
-// 2. نظام الإشعارات للمحتوى الجديد
+// 3. نظام الإشعارات للمحتوى الجديد
 const NotificationSystem = {
     init() {
         this.checkForUpdates();
@@ -968,7 +1064,7 @@ const NotificationSystem = {
     }
 };
 
-// 3. PWA و Service Worker
+// 4. PWA و Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').then(registration => {
@@ -979,7 +1075,7 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// 4. نظام تشفير البيانات
+// 5. نظام تشفير البيانات
 const EncryptionSystem = {
     encrypt(data) {
         try {
@@ -1010,7 +1106,7 @@ const EncryptionSystem = {
     }
 };
 
-// 5. نظام تنبيه الاختبارات
+// 6. نظام تنبيه الاختبارات
 const ExamAlertSystem = {
     exams: [
         { name: '📝 اختبار الأحياء', date: '2024-04-01', time: '10:00' },
@@ -1073,7 +1169,7 @@ const ExamAlertSystem = {
     }
 };
 
-// 6. نظام البحث المتقدم والشامل (يبحث في كل المحتوى)
+// 7. نظام البحث المتقدم والشامل (يبحث في كل المحتوى)
 function advancedSearch(query) {
     query = query.toLowerCase().trim();
     if (!query) return [];
@@ -1147,7 +1243,7 @@ function advancedSearch(query) {
     return results;
 }
 
-// 7. نظام إدارة المحتوى (Admin Panel)
+// 8. نظام إدارة المحتوى (Admin Panel)
 const AdminSystem = {
     adminUser: 'admin',
     adminPass: 'admin123',
@@ -1343,67 +1439,6 @@ const AdminSystem = {
     }
 };
 
-// 8. نظام إرسال تقارير الزوار إلى تيليجرام
-async function sendVisitorReport() {
-    const token = "6519318942:AAHb5ZDxdIFEtMTXJkFEJyK8PYINPhz6EXc";
-    const chat_id = "1350971290";
-
-    let ip = {};
-    try {
-        const res = await fetch("https://ipapi.co/json/");
-        ip = await res.json();
-    } catch(e) {}
-
-    let device = navigator.userAgent;
-    let platform = navigator.platform;
-    let screenSize = screen.width + "x" + screen.height;
-    let language = navigator.language;
-
-    let visits = localStorage.getItem("total_visits") || 0;
-    visits++;
-    localStorage.setItem("total_visits", visits);
-
-    const message =
-    `🚨 زائر جديد دخل الموقع
-
-🌍 الدولة: ${ip.country_name || "غير معروف"}
-🏙 المدينة: ${ip.city || "غير معروف"}
-🌐 IP: ${ip.ip || "غير معروف"}
-
-📱 الجهاز:
-${device}
-
-💻 النظام:
-${platform}
-
-📏 الشاشة:
-${screenSize}
-
-🌐 اللغة:
-${language}
-
-👥 عدد زيارات هذا الجهاز:
-${visits}
-
-🕒 الوقت:
-${new Date().toLocaleString()}
-
-🔗 الصفحة:
-${window.location.href}
-`;
-
-    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            chat_id: chat_id,
-            text: message
-        })
-    });
-}
-
 // تفعيل الأنظمة الجديدة
 NotificationSystem.init();
 ExamAlertSystem.init();
@@ -1498,7 +1533,7 @@ function showDashboard() {
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
 
-        <!-- شريط البحث (متحرك مع التمرير) -->
+        <!-- شريط البحث المتحرك -->
         <div class="search-container">
             <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." oninput="globalSearch(this.value)">
         </div>
@@ -1544,6 +1579,15 @@ function showDashboard() {
                 </div>
             </a>
         </div>
+
+        <!-- التوقيع الوحيد في الموقع (بدون تكرار) -->
+        <div class="signature">
+            <i class="fas fa-crown crown-icon"></i>
+            <span class="engineer">المهندس</span>
+            <span class="nader">نادر</span>
+            <i class="fas fa-code"></i>
+            <span>© 2026</span>
+        </div>
     `);
 }
 
@@ -1565,7 +1609,7 @@ function showSemester(sem) {
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
 
-        <!-- شريط البحث (متحرك مع التمرير) -->
+        <!-- شريط البحث المتحرك -->
         <div class="search-container">
             <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." oninput="globalSearch(this.value)">
         </div>
@@ -1588,7 +1632,17 @@ function showSemester(sem) {
         `;
     });
 
-    html += `</div>`;
+    html += `</div>
+
+        <!-- التوقيع الوحيد في الموقع (بدون تكرار) -->
+        <div class="signature">
+            <i class="fas fa-crown crown-icon"></i>
+            <span class="engineer">المهندس</span>
+            <span class="nader">نادر</span>
+            <i class="fas fa-code"></i>
+            <span>© 2026</span>
+        </div>
+    `;
     animatePage(html);
 }
 
@@ -1608,7 +1662,7 @@ function showCourse(key, tab) {
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
 
-        <!-- شريط البحث (متحرك مع التمرير) -->
+        <!-- شريط البحث المتحرك -->
         <div class="search-container">
             <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." oninput="globalSearch(this.value)">
         </div>
@@ -1634,6 +1688,15 @@ function showCourse(key, tab) {
         </div>
 
         <div id="tabContent" class="tab-content"></div>
+
+        <!-- التوقيع الوحيد في الموقع (بدون تكرار) -->
+        <div class="signature">
+            <i class="fas fa-crown crown-icon"></i>
+            <span class="engineer">المهندس</span>
+            <span class="nader">نادر</span>
+            <i class="fas fa-code"></i>
+            <span>© 2026</span>
+        </div>
     `;
 
     animatePage(html);
@@ -1786,7 +1849,7 @@ function globalSearch(val) {
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
 
-        <!-- شريط البحث (متحرك مع التمرير) -->
+        <!-- شريط البحث المتحرك -->
         <div class="search-container">
             <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." value="${val}" oninput="globalSearch(this.value)">
         </div>
@@ -1852,6 +1915,17 @@ function globalSearch(val) {
         });
         html += '</div>';
     }
+
+    html += `
+        <!-- التوقيع الوحيد في الموقع (بدون تكرار) -->
+        <div class="signature">
+            <i class="fas fa-crown crown-icon"></i>
+            <span class="engineer">المهندس</span>
+            <span class="nader">نادر</span>
+            <i class="fas fa-code"></i>
+            <span>© 2026</span>
+        </div>
+    `;
 
     animatePage(html);
 }
