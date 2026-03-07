@@ -593,12 +593,12 @@ style.textContent = `
         filter: drop-shadow(0 2px 4px rgba(52, 168, 83, 0.2));
     }
     
-    /* تنسيق شريط البحث المتحرك */
+    /* تنسيق شريط البحث المتحرك (واحد فقط) */
     .search-container {
         position: sticky;
         top: 80px;
         z-index: 999;
-        margin-bottom: 25px;
+        margin: 0 0 25px 0;
         transition: all 0.3s ease;
     }
     
@@ -1533,7 +1533,7 @@ function showDashboard() {
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
 
-        <!-- شريط البحث المتحرك -->
+        <!-- شريط البحث المتحرك (واحد فقط) -->
         <div class="search-container">
             <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." oninput="globalSearch(this.value)">
         </div>
@@ -1609,7 +1609,7 @@ function showSemester(sem) {
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
 
-        <!-- شريط البحث المتحرك -->
+        <!-- شريط البحث المتحرك (واحد فقط) -->
         <div class="search-container">
             <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." oninput="globalSearch(this.value)">
         </div>
@@ -1662,7 +1662,7 @@ function showCourse(key, tab) {
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
 
-        <!-- شريط البحث المتحرك -->
+        <!-- شريط البحث المتحرك (واحد فقط) -->
         <div class="search-container">
             <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." oninput="globalSearch(this.value)">
         </div>
@@ -1849,7 +1849,7 @@ function globalSearch(val) {
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
 
-        <!-- شريط البحث المتحرك -->
+        <!-- شريط البحث المتحرك (واحد فقط) -->
         <div class="search-container">
             <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." value="${val}" oninput="globalSearch(this.value)">
         </div>
