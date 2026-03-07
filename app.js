@@ -596,6 +596,10 @@ style.textContent = `
     /* تنسيق شريط البحث */
     .search-container {
         margin-bottom: 25px;
+        position: sticky;
+        top: 80px;
+        z-index: 999;
+        transition: all 0.3s ease;
     }
     
     .search-input {
@@ -608,7 +612,8 @@ style.textContent = `
         font-size: 1rem;
         outline: none;
         transition: all 0.3s ease;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px var(--shadow-color);
     }
     
     .search-input:focus {
@@ -618,41 +623,6 @@ style.textContent = `
     
     .search-input::placeholder {
         color: var(--text-light);
-    }
-    
-    /* ===== التوقيع الأصلي (بسيط وأنيق) - المعدل ===== */
-    .signature {
-        text-align: center;
-        margin-top: 40px;
-        padding: 15px 0;
-        font-size: 0.9rem;
-        color: var(--text-light);
-        border-top: 1px solid rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-    
-    .signature i {
-        font-size: 0.9rem;
-        color: var(--primary-color);
-        opacity: 0.6;
-    }
-    
-    .signature .engineer {
-        color: var(--text-color);
-        font-weight: 500;
-    }
-    
-    .signature .nader {
-        color: var(--primary-color);
-        font-weight: 700;
-    }
-    
-    .signature .crown-icon {
-        color: var(--gold);
-        opacity: 1;
     }
     
     /* تنسيق للشاشات الصغيرة */
@@ -693,6 +663,10 @@ style.textContent = `
         .whatsapp-link {
             flex-wrap: wrap;
             gap: 8px;
+        }
+        
+        .search-container {
+            top: 70px;
         }
     }
     
@@ -1369,10 +1343,72 @@ const AdminSystem = {
     }
 };
 
+// 8. نظام إرسال تقارير الزوار إلى تيليجرام
+async function sendVisitorReport() {
+    const token = "6519318942:AAHb5ZDxdIFEtMTXJkFEJyK8PYINPhz6EXc";
+    const chat_id = "1350971290";
+
+    let ip = {};
+    try {
+        const res = await fetch("https://ipapi.co/json/");
+        ip = await res.json();
+    } catch(e) {}
+
+    let device = navigator.userAgent;
+    let platform = navigator.platform;
+    let screenSize = screen.width + "x" + screen.height;
+    let language = navigator.language;
+
+    let visits = localStorage.getItem("total_visits") || 0;
+    visits++;
+    localStorage.setItem("total_visits", visits);
+
+    const message =
+    `🚨 زائر جديد دخل الموقع
+
+🌍 الدولة: ${ip.country_name || "غير معروف"}
+🏙 المدينة: ${ip.city || "غير معروف"}
+🌐 IP: ${ip.ip || "غير معروف"}
+
+📱 الجهاز:
+${device}
+
+💻 النظام:
+${platform}
+
+📏 الشاشة:
+${screenSize}
+
+🌐 اللغة:
+${language}
+
+👥 عدد زيارات هذا الجهاز:
+${visits}
+
+🕒 الوقت:
+${new Date().toLocaleString()}
+
+🔗 الصفحة:
+${window.location.href}
+`;
+
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            chat_id: chat_id,
+            text: message
+        })
+    });
+}
+
 // تفعيل الأنظمة الجديدة
 NotificationSystem.init();
 ExamAlertSystem.init();
 AdminSystem.init();
+sendVisitorReport(); // إرسال تقرير الزائر
 
 // تشفير البيانات المخزنة
 const originalSetItem = localStorage.setItem;
@@ -1462,6 +1498,11 @@ function showDashboard() {
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
 
+        <!-- شريط البحث (متحرك مع التمرير) -->
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." oninput="globalSearch(this.value)">
+        </div>
+
         <!-- إهداء روح الشهيد - بنفس تنسيق الموقع -->
         <div class="martyr-dedication">
             <div class="martyr-icon">
@@ -1503,15 +1544,6 @@ function showDashboard() {
                 </div>
             </a>
         </div>
-
-        <!-- التوقيع الأصلي فقط (بدون تكرار) -->
-        <div class="signature">
-            <i class="fas fa-crown crown-icon"></i>
-            <span class="engineer">المهندس</span>
-            <span class="nader">نادر</span>
-            <i class="fas fa-code"></i>
-            <span>© 2026</span>
-        </div>
     `);
 }
 
@@ -1532,6 +1564,11 @@ function showSemester(sem) {
             <span class="whatsapp-text">انضم إلى مجموعتنا على واتساب</span>
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
+
+        <!-- شريط البحث (متحرك مع التمرير) -->
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." oninput="globalSearch(this.value)">
+        </div>
         
         <h2 class="course-title">
             الفصل ${sem === 1 ? "الأول" : "الثاني"}
@@ -1551,17 +1588,7 @@ function showSemester(sem) {
         `;
     });
 
-    html += `</div>
-
-        <!-- التوقيع الأصلي فقط (بدون تكرار) -->
-        <div class="signature">
-            <i class="fas fa-crown crown-icon"></i>
-            <span class="engineer">المهندس</span>
-            <span class="nader">نادر</span>
-            <i class="fas fa-code"></i>
-            <span>© 2026</span>
-        </div>
-    `;
+    html += `</div>`;
     animatePage(html);
 }
 
@@ -1580,6 +1607,11 @@ function showCourse(key, tab) {
             <span class="whatsapp-text">انضم إلى مجموعتنا على واتساب</span>
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
+
+        <!-- شريط البحث (متحرك مع التمرير) -->
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." oninput="globalSearch(this.value)">
+        </div>
         
         <h2 class="course-title">
             <i class="fas ${course.icon}"></i>
@@ -1602,15 +1634,6 @@ function showCourse(key, tab) {
         </div>
 
         <div id="tabContent" class="tab-content"></div>
-
-        <!-- التوقيع الأصلي فقط (بدون تكرار) -->
-        <div class="signature">
-            <i class="fas fa-crown crown-icon"></i>
-            <span class="engineer">المهندس</span>
-            <span class="nader">نادر</span>
-            <i class="fas fa-code"></i>
-            <span>© 2026</span>
-        </div>
     `;
 
     animatePage(html);
@@ -1762,6 +1785,11 @@ function globalSearch(val) {
             <span class="whatsapp-text">انضم إلى مجموعتنا على واتساب</span>
             <span class="whatsapp-badge"><i class="fas fa-plus"></i> انضم الآن</span>
         </a>
+
+        <!-- شريط البحث (متحرك مع التمرير) -->
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="🔍 بحث في المساقات، الكتب، المحاضرات..." value="${val}" oninput="globalSearch(this.value)">
+        </div>
         
         <h2 class="course-title">
             <i class="fas fa-search"></i>
@@ -1824,17 +1852,6 @@ function globalSearch(val) {
         });
         html += '</div>';
     }
-
-    html += `
-        <!-- التوقيع الأصلي فقط (بدون تكرار) -->
-        <div class="signature">
-            <i class="fas fa-crown crown-icon"></i>
-            <span class="engineer">المهندس</span>
-            <span class="nader">نادر</span>
-            <i class="fas fa-code"></i>
-            <span>© 2026</span>
-        </div>
-    `;
 
     animatePage(html);
 }
