@@ -1,10 +1,11 @@
-// ملف Service Worker منفصل للتخزين المؤقت
-const CACHE_NAME = 'university-cache-v2';
+// Service Worker للتخزين المؤقت والعمل دون إنترنت
+const CACHE_NAME = 'university-cache-v5';
 const urlsToCache = [
     '/',
     '/index.html',
     '/style.css',
     '/app.js',
+    '/manifest.json',
     'https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
     'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js'
@@ -14,8 +15,10 @@ self.addEventListener('install', event => {
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(urlsToCache))
-            .catch(error => console.log('خطأ في التخزين المؤقت:', error))
+            .then(cache => {
+                return cache.addAll(urlsToCache);
+            })
+            .catch(error => console.log('Service Worker install error:', error))
     );
 });
 
@@ -32,8 +35,9 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-    // تجاهل طلبات API
-    if (event.request.url.includes('api.countapi.xyz')) {
+    // تجاهل طلبات API والإحصائيات
+    if (event.request.url.includes('api.countapi.xyz') || 
+        event.request.url.includes('google-analytics')) {
         return;
     }
     
@@ -45,8 +49,8 @@ self.addEventListener('fetch', event => {
                 }
                 return fetch(event.request)
                     .then(response => {
-                        // لا تقم بتخزين روابط خارجية كبيرة
                         if (!response || response.status !== 200 || 
+                            response.type === 'opaque' ||
                             event.request.url.includes('mediafire') ||
                             event.request.url.includes('drive.google')) {
                             return response;
@@ -59,9 +63,17 @@ self.addEventListener('fetch', event => {
                         return response;
                     })
                     .catch(() => {
-                        // فشل الاتصال بالإنترنت
-                        return new Response('غير متصل', { status: 503 });
+                        return new Response('أنت غير متصل بالإنترنت', { 
+                            status: 503, 
+                            statusText: 'Service Unavailable' 
+                        });
                     });
             })
     );
+});
+
+self.addEventListener('message', event => {
+    if (event.data === 'skipWaiting') {
+        self.skipWaiting();
+    }
 });
