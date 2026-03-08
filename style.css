@@ -980,3 +980,58 @@ body.device-tablet {
 .ltr {
     direction: ltr;
 }
+
+/* ===== تعديل حجم جميع الأيقونات بدون حذف أي كود ===== */
+
+.icon-medium{
+    font-size:1.1rem !important;
+    width:38px !important;
+    height:38px !important;
+}
+
+.icon-medium.small{
+    font-size:1rem !important;
+    width:32px !important;
+    height:32px !important;
+}
+
+.icon-medium.large{
+    font-size:1.3rem !important;
+    width:45px !important;
+    height:45px !important;
+}
+
+/* تصغير أيقونات البطاقات */
+.card i{
+    font-size:1.4rem !important;
+}
+
+/* تصغير أيقونات التنقل السفلي */
+.nav-item i{
+    font-size:1.2rem !important;
+}
+
+/* تصغير أيقونات الأزرار */
+.book-button i{
+    font-size:1.2rem !important;
+}
+
+/* تصغير أيقونات العناوين */
+.section-title i{
+    font-size:1.2rem !important;
+}
+
+/* تصغير أيقونات واتساب */
+.whatsapp-link i{
+    font-size:1.6rem !important;
+}
+
+/* تصغير أيقونات الإهداء */
+.martyr-icon i{
+    font-size:1.4rem !important;
+}
+
+/* تصغير أيقونات الأدمن */
+#admin-btn i{
+    font-size:1.3rem !important;
+}
