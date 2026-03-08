@@ -1,536 +1,53 @@
-/* ===== المتغيرات الأساسية ===== */
+/* ثيم أساسي - أزرق مريح */
 :root {
     --primary-color: #4A90E2;
-    --primary-dark: #2171c7;
-    --primary-light: #7bb0e8;
-    --primary-soft: #e3f0ff;
-    --white: #ffffff;
-    --white-soft: #f8faff;
+    --primary-dark: #357ABD;
+    --primary-light: #6BA5E8;
+    --accent-color: #50C878;
+    --bg-gradient-start: #E8F0FE;
+    --bg-gradient-end: #D1E2FC;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --text-color: #2C3E50;
+    --text-light: #5D6D7E;
+    --border-color: #BDC9D6;
+    --shadow-color: rgba(74, 144, 226, 0.2);
+    --hover-bg: #F0F7FF;
     --gold: #f1c40f;
-    --gold-light: #f9e79f;
-    --gold-dark: #d4ac0d;
-    --text-dark: #2c3e50;
-    --text-medium: #5a6b7a;
-    --text-light: #7f8c8d;
-    --shadow-sm: 0 4px 12px rgba(74, 144, 226, 0.15);
-    --shadow-md: 0 8px 24px rgba(74, 144, 226, 0.2);
-    --shadow-lg: 0 16px 32px rgba(74, 144, 226, 0.25);
-    --shadow-gold: 0 8px 24px rgba(241, 196, 15, 0.2);
-    --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    --gradient-gold: linear-gradient(135deg, var(--gold), var(--gold-dark));
-    --gradient-white: linear-gradient(135deg, var(--white), var(--white-soft));
-}
-
-/* ===== التنسيقات العامة ===== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    --whatsapp-color: #25D366;
 }
 
 body {
-    background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
-    color: var(--text-dark);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    color: var(--text-color);
     font-family: 'Cairo', sans-serif;
     margin: 0;
     padding: 20px 20px 80px 20px;
     min-height: 100vh;
-    direction: rtl;
-    position: relative;
+    transition: all 0.3s ease;
 }
 
-/* ===== إيقونات صغيرة جداً ومناسبة ===== */
-.icon-small {
-    font-size: 1.3rem !important;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    margin: 0 auto 10px auto;
-    transition: all 0.2s ease;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.icon-small.primary-bg {
-    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
-    color: var(--white);
-    box-shadow: var(--shadow-sm);
-}
-
-.icon-small.gold-bg {
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
-    color: var(--white);
-    box-shadow: var(--shadow-gold);
-}
-
-.icon-small.white-bg {
-    background: var(--white);
-    color: var(--primary-color);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--primary-soft);
-}
-
-.icon-small.smaller {
-    font-size: 1.1rem !important;
-    width: 35px;
-    height: 35px;
-    border-radius: 10px;
-}
-
-.icon-small.large {
-    font-size: 1.5rem !important;
-    width: 45px;
-    height: 45px;
-    border-radius: 14px;
-}
-
-/* أيقونات النجمة */
-.favorite-star i {
-    font-size: 1.2rem !important;
-}
-
-/* أيقونات التبويبات */
-.tab i {
-    font-size: 1rem !important;
-    margin-left: 5px;
-}
-
-/* أيقونات البطاقات */
+/* تصغير الايقونات وجعلها مناسبة */
 .card i {
     font-size: 1.3rem !important;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
 }
 
-/* أيقونات أزرار الكتب */
+.card:hover i {
+    transform: scale(1.1);
+    color: var(--primary-dark);
+}
+
 .book-button i {
-    font-size: 1.2rem !important;
-    margin-left: 8px;
-}
-
-/* أيقونات التذييل */
-.site-footer i {
     font-size: 1.1rem !important;
-}
-
-/* ===== تحسين شكل البطاقات ===== */
-.card {
-    background: var(--white);
-    border-radius: 20px;
-    padding: 15px 15px;
-    text-align: center;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: 1px solid rgba(74, 144, 226, 0.1);
-    position: relative;
-    overflow: hidden;
-}
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--gradient-primary);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-}
-
-.card:hover::before {
-    transform: scaleX(1);
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-light);
-}
-
-.card h3 {
-    color: var(--text-dark);
-    margin: 8px 0 5px 0;
-    font-size: 1rem;
-    font-weight: 700;
-}
-
-.card .code {
-    background: var(--primary-soft);
-    color: var(--primary-dark);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: inline-block;
-}
-
-/* ===== الهيدر مع البحث ===== */
-.site-header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 12px 20px;
-    border-radius: 40px;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(255,255,255,0.8);
-}
-
-.search-input {
-    width: 100%;
-    padding: 12px 25px;
-    border-radius: 30px;
-    border: 2px solid var(--primary-soft);
-    background: var(--white);
-    color: var(--text-dark);
-    font-size: 0.95rem;
-    outline: none;
-    transition: all 0.3s ease;
-    font-family: 'Cairo', sans-serif;
-}
-
-.search-input::placeholder {
-    color: var(--text-light);
-    font-size: 0.9rem;
-}
-
-/* ===== شريط التنقل السفلي ===== */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 8px 5px;
-    box-shadow: 0 -4px 15px rgba(74, 144, 226, 0.1);
-    z-index: 1000;
-    border-top: 1px solid rgba(74, 144, 226, 0.15);
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: var(--text-medium);
-    font-size: 0.7rem;
-    padding: 5px 12px;
-    border-radius: 30px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    background: none;
-    border: none;
-    font-family: 'Cairo', sans-serif;
-}
-
-.nav-item i {
-    font-size: 1.3rem;
-    margin-bottom: 3px;
-}
-
-.nav-item.active {
-    background: var(--primary-soft);
+    margin-left: 8px;
     color: var(--primary-color);
-}
-
-.nav-item.active i {
-    color: var(--primary-color);
-}
-
-/* ===== نجمة المفضلة ===== */
-.favorite-star {
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--white);
-    box-shadow: var(--shadow-sm);
-}
-
-.favorite-star.active {
-    background: var(--gold-light);
-}
-
-/* ===== رابط الواتساب ===== */
-.whatsapp-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-    border-radius: 40px;
-    margin-bottom: 20px;
-    text-decoration: none;
-    color: var(--text-dark);
-    transition: all 0.3s ease;
-    border: 2px solid var(--white);
-    box-shadow: var(--shadow-sm);
-}
-
-.whatsapp-link i {
-    font-size: 1.5rem !important;
-    color: #25D366;
-}
-
-.whatsapp-text {
-    flex: 1;
-    font-weight: 600;
-    color: #075E54;
-    font-size: 0.95rem;
-    margin-right: 10px;
-}
-
-.whatsapp-badge {
-    background: #25D366;
-    color: white;
-    padding: 5px 15px;
-    border-radius: 30px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    white-space: nowrap;
-    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
-}
-
-/* ===== إهداء الشهيد ===== */
-.martyr-dedication {
-    background: linear-gradient(135deg, var(--white), var(--white-soft));
-    border: 2px solid var(--gold-light);
-    border-radius: 25px;
-    padding: 15px 15px;
-    margin: 15px auto 20px auto;
-    max-width: 500px;
-    text-align: center;
-    box-shadow: var(--shadow-gold);
-}
-
-.martyr-icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-
-.martyr-icon i {
-    font-size: 1.3rem !important;
-    color: var(--gold);
-}
-
-.martyr-icon i.fa-heart {
-    color: #e74c3c;
-    font-size: 1.2rem !important;
-}
-
-.martyr-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-medium);
-    margin-bottom: 5px;
-}
-
-.martyr-name {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--primary-dark);
-    margin-bottom: 8px;
-    background: var(--primary-soft);
-    display: inline-block;
-    padding: 5px 20px;
-    border-radius: 40px;
-    border: 2px solid var(--gold);
-}
-
-.martyr-dua {
-    font-size: 0.85rem;
-    color: var(--text-medium);
-    line-height: 1.6;
-}
-
-/* ===== التبويبات ===== */
-.tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.tab {
-    background: var(--white);
-    padding: 8px 18px;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-weight: 600;
-    border: 2px solid var(--primary-soft);
-    color: var(--text-dark);
-    font-size: 0.9rem;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.tab.active {
-    background: var(--gradient-primary);
-    color: var(--white);
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-sm);
-}
-
-.tab.active i {
-    color: var(--white) !important;
-}
-
-/* ===== أزرار الكتب ===== */
-.book-button {
-    display: flex;
-    align-items: center;
-    padding: 12px 18px;
-    background: var(--white);
-    border-radius: 16px;
-    margin-bottom: 12px;
-    text-decoration: none;
-    color: var(--text-dark);
-    transition: all 0.2s ease;
-    border: 2px solid var(--primary-soft);
-    box-shadow: var(--shadow-sm);
-    font-size: 0.95rem;
-}
-
-.book-button:hover {
-    background: var(--primary-soft);
-    transform: translateX(-5px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-color);
-}
-
-.book-button i {
-    font-size: 1.2rem !important;
-    margin-left: 12px;
-    color: var(--primary-color);
-}
-
-.click-here {
-    margin-right: auto;
-    background: var(--gradient-primary) !important;
-    color: var(--white) !important;
-    padding: 6px 15px;
-    border-radius: 30px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.click-here i {
-    font-size: 0.9rem !important;
-    color: white !important;
-    margin-left: 3px;
-}
-
-/* ===== التوقيع ===== */
-.site-footer {
-    text-align: center;
-    margin-top: 40px;
-    padding: 15px;
-    background: var(--white);
-    border-radius: 25px;
-    border: 2px solid var(--primary-soft);
-    box-shadow: var(--shadow-sm);
-}
-
-.footer-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--primary-dark);
-    margin-bottom: 8px;
-}
-
-.footer-signature {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin: 8px 0;
-    font-size: 1rem;
-}
-
-.footer-signature .engineer {
-    color: var(--text-medium);
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.footer-signature .nader {
-    color: var(--primary-color);
-    font-weight: 800;
-    font-size: 1.2rem;
-    background: var(--primary-soft);
-    padding: 3px 15px;
-    border-radius: 30px;
-}
-
-.footer-copyright {
-    font-size: 0.8rem;
-    color: var(--text-light);
-}
-
-/* ===== أزرار الرجوع ===== */
-.back-button {
-    background: var(--gradient-primary);
-    color: var(--white);
-    border: none;
-    padding: 8px 20px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-    transition: all 0.2s ease;
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-}
-
-.back-button i {
-    font-size: 0.9rem !important;
-}
-
-/* ===== محتوى التبويبات ===== */
-.books-section {
-    background: var(--white);
-    border-radius: 25px;
-    padding: 20px;
-    box-shadow: var(--shadow-sm);
-    border: 2px solid var(--primary-soft);
-    margin-bottom: 20px;
-}
-
-.section-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    color: var(--text-dark);
-    font-size: 1.1rem;
-    border-bottom: 2px solid var(--primary-soft);
-    padding-bottom: 12px;
 }
 
 .section-title i {
@@ -538,23 +55,285 @@ body {
     color: var(--primary-color);
 }
 
-/* ===== الشبكة ===== */
+.content-info i {
+    font-size: 1.2rem !important;
+}
+
+.tab i {
+    font-size: 0.9rem !important;
+    margin-left: 5px;
+}
+
+.click-here i {
+    font-size: 0.8rem !important;
+    margin-left: 3px;
+}
+
+.page-title i {
+    font-size: 1.8rem !important;
+    color: var(--primary-color);
+}
+
+/* ===== رابط مجموعة الواتساب ===== */
+.whatsapp-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: rgba(37, 211, 102, 0.1);
+    border-radius: 15px;
+    margin-bottom: 15px;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(37, 211, 102, 0.3);
+    backdrop-filter: blur(5px);
+    font-size: 0.95rem;
+}
+
+.whatsapp-link:hover {
+    background: rgba(37, 211, 102, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2);
+    border-color: var(--whatsapp-color);
+}
+
+.whatsapp-link i {
+    font-size: 1.3rem !important;
+    color: var(--whatsapp-color);
+    margin-left: 10px;
+}
+
+.whatsapp-text {
+    flex: 1;
+    font-weight: 600;
+    color: #075E54;
+}
+
+.whatsapp-badge {
+    background: var(--whatsapp-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.whatsapp-badge i {
+    color: white !important;
+    font-size: 0.75rem !important;
+    margin-left: 3px;
+}
+
+/* ===== إهداء الشهيد ===== */
+.martyr-dedication {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 15px 20px;
+    margin: 20px auto 30px auto;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+.martyr-icon {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.martyr-icon i {
+    font-size: 1.1rem !important;
+}
+
+.martyr-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.martyr-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.martyr-dua {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+/* تنسيق البطاقات */
+.card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 8px 20px var(--shadow-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    background: var(--hover-bg);
+}
+
+.card h3 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+/* التبويبات */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tab {
+    background: var(--card-bg);
+    padding: 8px 18px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.tab.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* الشبكة */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
-/* ===== الشاشات الصغيرة ===== */
+/* شريط البحث */
+.search-container {
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 40px;
+    border: 2px solid var(--border-color);
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.95rem;
+}
+
+/* التوقيع */
+.signature {
+    text-align: center;
+    margin-top: 40px;
+    padding: 15px 0;
+}
+
+.signature p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+/* أزرار الكتب */
+.book-button {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background: var(--card-bg);
+    border-radius: 15px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+    font-size: 0.95rem;
+}
+
+.click-here {
+    margin-right: auto;
+    background: var(--primary-color);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+/* شريط التنقل السفلي */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 5px;
+    box-shadow: 0 -4px 12px var(--shadow-color);
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 5px 10px;
+    border-radius: 30px;
+}
+
+.nav-item i {
+    font-size: 1.2rem !important;
+    margin-bottom: 2px;
+}
+
+.nav-item.active {
+    color: var(--primary-color);
+    background: var(--hover-bg);
+}
+
+/* نجمة المفضلة */
+.favorite-star {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.favorite-star:hover {
+    transform: scale(1.2);
+}
+
+/* أزرار الرجوع */
+.back-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* للشاشات الصغيرة */
 @media (max-width: 768px) {
-    body {
-        padding: 10px 10px 70px 10px;
-    }
-    
     .grid {
         grid-template-columns: 1fr;
-        gap: 12px;
     }
     
     .tabs {
@@ -563,39 +342,6 @@ body {
     
     .tab {
         width: 100%;
-        justify-content: center;
-        padding: 10px;
-    }
-    
-    .book-button {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    .click-here {
-        width: 100%;
         text-align: center;
-        margin-right: 0;
-        justify-content: center;
     }
-    
-    .icon-small {
-        width: 35px;
-        height: 35px;
-        font-size: 1.1rem !important;
-    }
-    
-    .card h3 {
-        font-size: 0.95rem;
-    }
-}
-
-/* ===== أنيميشن ===== */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.card, .book-button {
-    animation: fadeIn 0.4s ease;
 }
