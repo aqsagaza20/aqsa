@@ -524,35 +524,54 @@ const icons = {
  */
 let courses = {};
 
-function loadCourses() {
-    try {
-        const saved = localStorage.getItem('university_courses');
-        if (saved) {
-            courses = JSON.parse(saved);
-        } else {
-            courses = JSON.parse(JSON.stringify(defaultCourses)); // نسخ عميق
-            localStorage.setItem('university_courses', JSON.stringify(courses));
-        }
-    } catch (e) {
-        console.error('خطأ في تحميل المساقات:', e);
-        courses = JSON.parse(JSON.stringify(defaultCourses));
-    }
+// إذا كانت البيانات موجودة في Firebase استخدمها
+if (window.firebaseCourses) {
+    courses = window.firebaseCourses;
+} else {
+    courses = JSON.parse(JSON.stringify(defaultCourses));
 }
 
 /**
  * حفظ المساقات في localStorage
  */
+/**
+ * حفظ المساقات في localStorage
+ */
 function saveCourses() {
-    try {
-        localStorage.setItem('university_courses', JSON.stringify(courses));
-    } catch (e) {
-        console.error('خطأ في حفظ المساقات:', e);
+
+    if (window.saveCoursesToFirebase) {
+        saveCoursesToFirebase(courses);
     }
+
+}
+
+
+// دالة تحميل المساقات من Firebase
+/**
+ * حفظ المساقات في localStorage
+ */
+
+
+
+// دالة تحميل المساقات من Firebase
+function loadCourses() {
+
+    if (window.loadCoursesFromFirebase) {
+
+        window.loadCoursesFromFirebase()
+
+    } else {
+
+        courses = JSON.parse(JSON.stringify(defaultCourses))
+
+        SearchSystem.buildCache()
+
+    }
+
 }
 
 // تحميل المساقات
 loadCourses();
-
 // ============================================================================
 // 3. نظام المفضلة المتكامل (محسّن جداً)
 // ============================================================================
@@ -1286,66 +1305,95 @@ const NotificationSystem = {
      * عرض إشعار
      */
     showNotification(options) {
-        const { title, message, type = 'info', duration = 5000 } = options;
-        
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        
-        const icons = {
-            info: 'fa-info-circle',
-            success: 'fa-check-circle',
-            warning: 'fa-exclamation-triangle',
-            error: 'fa-times-circle'
-        };
-        
-        const colors = {
-            info: 'var(--primary-color)',
-            success: 'var(--success)',
-            warning: 'var(--warning)',
-            error: 'var(--danger)'
-        };
-        
-        notification.style.cssText = `
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, ${colors[type]}, ${colors[type]}dd);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            box-shadow: var(--shadow-lg);
-            z-index: 10001;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            animation: slideDown 0.5s ease;
-            font-size: 1rem;
-            border: 2px solid var(--gold);
-            direction: rtl;
-            max-width: 90%;
-        `;
-        
-        notification.innerHTML = `
-            <i class="fas ${icons[type]}" style="font-size: 1.3rem;"></i>
-            <div>
-                ${title ? `<strong>${title}</strong><br>` : ''}
-                <span>${message}</span>
-            </div>
-            <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer; margin-right: 10px; font-size: 1.2rem;">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
-        
-        document.body.appendChild(notification);
-        
+
+    const { title, message, type = 'info', duration = 5000 } = options;
+
+    const icons = {
+        info: 'fa-info-circle',
+        success: 'fa-check-circle',
+        warning: 'fa-exclamation-triangle',
+        error: 'fa-times-circle'
+    };
+
+    const colors = {
+        info: 'var(--primary-color)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        error: 'var(--danger)'
+    };
+
+    const notification = document.createElement('div');
+
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-80px);
+        background: ${colors[type]};
+        color: white;
+        padding: 15px 30px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-lg);
+        z-index: 10001;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 1rem;
+        border: 2px solid var(--gold);
+        direction: rtl;
+        max-width: 90%;
+        transition: transform 0.4s ease, opacity 0.4s ease;
+        opacity: 0;
+    `;
+
+    notification.innerHTML = `
+        <i class="fas ${icons[type]}" style="font-size:1.3rem"></i>
+        <div>
+            ${title ? `<strong>${title}</strong><br>` : ''}
+            <span>${message}</span>
+        </div>
+        <button onclick="this.parentElement.remove()" style="
+            background:none;
+            border:none;
+            color:white;
+            cursor:pointer;
+            font-size:1.2rem;
+        ">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+
+    document.body.appendChild(notification);
+
+    // حركة الدخول
+    setTimeout(() => {
+        notification.style.transform = "translateX(-50%) translateY(0)";
+        notification.style.opacity = "1";
+    }, 50);
+
+    // صوت الإشعار
+    try {
+        const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3");
+        audio.volume = 0.4;
+        audio.play();
+    } catch (e) {}
+
+    // الاختفاء
+    setTimeout(() => {
+
+        notification.style.transform = "translateX(-50%) translateY(-80px)";
+        notification.style.opacity = "0";
+
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.remove();
             }
-        }, duration);
-    }
-};
+        }, 400);
+
+    }, duration);
+
+},
+}; 
 
 // تهيئة نظام الإشعارات
 NotificationSystem.init();
@@ -1355,7 +1403,7 @@ NotificationSystem.init();
 // ============================================================================
 
 const AdminSystem = {
-    adminPasswordHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', // SHA256 of 'admin'
+    
     isLoggedIn: false,
     panelElement: null,
     loginElement: null,
@@ -1622,29 +1670,37 @@ const AdminSystem = {
      * تسجيل الدخول
      */
     login() {
-        const password = document.getElementById('admin-password')?.value;
-        
-        if (!password) {
-            alert('❌ الرجاء إدخال كلمة المرور');
-            return;
-        }
-        
-        // التحقق من كلمة المرور (admin)
-        if (password === 'admin') {
-            this.isLoggedIn = true;
-            localStorage.setItem('admin_token', 'authenticated');
-            this.closeLogin();
-            this.showAdminPanel();
-            
-            NotificationSystem.showNotification({
-                title: '✅ مرحباً بك',
-                message: 'تم تسجيل الدخول بنجاح',
-                type: 'success'
-            });
-        } else {
-            alert('❌ كلمة المرور غير صحيحة');
-        }
-    },
+
+const password = document.getElementById('admin-password')?.value;
+
+if (!password) {
+    alert('❌ الرجاء إدخال كلمة المرور');
+    return;
+}
+
+if (window.adminLogin) {
+
+window.adminLogin("admin@nursing.com", password);
+
+this.isLoggedIn = true;
+localStorage.setItem('admin_token', 'authenticated');
+
+this.closeLogin();
+this.showAdminPanel();
+
+NotificationSystem.showNotification({
+    title: '✅ مرحباً بك',
+    message: 'تم تسجيل الدخول بنجاح',
+    type: 'success'
+});
+
+} else {
+
+alert('❌ نظام تسجيل الدخول غير متصل');
+
+}
+
+}
     
     /**
      * تسجيل الخروج
@@ -1663,23 +1719,26 @@ const AdminSystem = {
     /**
      * حذف مساق
      */
-    deleteCourse(key) {
-        if (confirm(`⚠️ هل أنت متأكد من حذف المساق "${courses[key]?.title}"؟`)) {
-            // حذف من المفضلة
-            FavoritesSystem.items = FavoritesSystem.items.filter(item => item.id !== key);
-            FavoritesSystem.save();
-            
-            delete courses[key];
-            saveCourses();
-            
-            this.refreshStats();
-            
-            NotificationSystem.showNotification({
-                message: '✅ تم حذف المساق بنجاح',
-                type: 'success'
-            });
+    async deleteCourse(key){
+
+    if(confirm("هل تريد حذف المساق؟")){
+
+        if(window.deleteCourseFromFirebase){
+            await window.deleteCourseFromFirebase(key)
         }
-    },
+
+        NotificationSystem.showNotification({
+            message:"تم حذف المساق",
+            type:"success"
+        })
+
+        setTimeout(()=>{
+            handleHashChange()
+        },500)
+
+    }
+
+}
     
     /**
      * حذف اختبار
@@ -1699,11 +1758,30 @@ const AdminSystem = {
     /**
      * عرض نموذج إضافة مساق
      */
-    showAddCourseForm() {
-        // تنفيذ نموذج إضافة مساق
-        alert('نموذج إضافة مساق - قيد التطوير');
-    },
-    
+    showAddCourseForm(){
+
+    const title = prompt("اسم المساق")
+
+    if(!title) return
+
+    const key = title.replace(/\s+/g,"_").toLowerCase()
+
+    const course = {
+        title:title,
+        icon:"fa-book",
+        code:"NEW",
+        semester:1,
+        books:[],
+        lectures:[],
+        summaries:[],
+        exams:[]
+    }
+
+    if(window.addCourseToFirebase){
+        window.addCourseToFirebase(key,course)
+    }
+
+}
     /**
      * عرض نموذج إضافة اختبار
      */
@@ -2759,10 +2837,23 @@ function initApp() {
 window.FavoritesSystem = FavoritesSystem;
 window.AdminSystem = AdminSystem;
 window.handleSearchInput = handleSearchInput;
+window.refreshCourses = function(){
 
-// بدء التطبيق
-window.addEventListener('load', initApp);
+    if(window.firebaseCourses){
 
+        courses = window.firebaseCourses
+
+        localStorage.setItem("courses_backup", JSON.stringify(courses))
+
+        SearchSystem.buildCache()
+        FavoritesSystem.renderStars()
+
+        handleHashChange()
+
+    }
+
+}
+SearchSystem.buildCache()
 // ============================================================================
 // النهاية - جميع الحقوق محفوظة للمهندس نادر 2026
 // ============================================================================
