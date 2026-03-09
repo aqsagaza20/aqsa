@@ -1,129 +1,157 @@
-// استيراد Firebase
+// ===============================
+// Firebase Setup
+// ===============================
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { 
-  getDatabase, 
-  ref, 
-  set, 
-  get, 
-  onValue, 
-  remove, 
-  update 
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+signOut,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 
-// إعدادات مشروعك
+// ===============================
+// Firebase Config
+// ===============================
+
 const firebaseConfig = {
-  apiKey: "AIzaSyD70tZ67zeIARlOzOfP4zALbPjfmef31E8",
-  authDomain: "nader-c1691.firebaseapp.com",
-  databaseURL: "https://nader-c1691-default-rtdb.firebaseio.com",
-  projectId: "nader-c1691",
-  storageBucket: "nader-c1691.firebasestorage.app",
-  messagingSenderId: "455340592959",
-  appId: "1:455340592959:web:796eb55b96d0f4b0690d8a",
-  measurementId: "G-0NVHHTN17D"
+
+apiKey: "AIzaSyD70tZ67zeIARlOzOfP4zALbPjfmef31E8",
+
+authDomain: "nader-c1691.firebaseapp.com",
+
+databaseURL: "https://nader-c1691-default-rtdb.firebaseio.com",
+
+projectId: "nader-c1691",
+
+storageBucket: "nader-c1691.firebasestorage.app",
+
+messagingSenderId: "455340592959",
+
+appId: "1:455340592959:web:796eb55b96d0f4b0690d8a",
+
+measurementId: "G-0NVHHTN17D"
+
 };
 
 
-// تشغيل Firebase
+// ===============================
+// Initialize Firebase
+// ===============================
+
 const app = initializeApp(firebaseConfig);
+
 const db = getDatabase(app);
 
+const auth = getAuth(app);
 
-// =======================================================
+
+// ===============================
 // تحميل المساقات من Firebase
-// =======================================================
+// ===============================
 
-function loadCoursesFromFirebase() {
+window.loadCoursesFromFirebase = async function(){
 
-    const coursesRef = ref(db, "courses");
+try{
 
-    onValue(coursesRef, (snapshot) => {
+const snapshot = await get(ref(db,"courses"))
 
-        const data = snapshot.val();
+if(snapshot.exists()){
 
-        if (data) {
-            console.log("تم تحميل المساقات من Firebase");
+window.firebaseCourses = snapshot.val()
 
-            window.courses = data;
+}
 
-            if (typeof SearchSystem !== "undefined") {
-                SearchSystem.buildCache();
-            }
+}catch(error){
 
-            if (typeof handleHashChange !== "undefined") {
-                handleHashChange();
-            }
-        }
+console.log("Firebase load error",error)
 
-    });
+}
 
 }
 
 
-// =======================================================
-// حفظ المساقات إلى Firebase
-// =======================================================
+// ===============================
+// حفظ المساقات في Firebase
+// ===============================
 
-function saveCoursesToFirebase(courses) {
+window.saveCoursesToFirebase = async function(courses){
 
-    const coursesRef = ref(db, "courses");
+try{
 
-    set(coursesRef, courses);
+await set(ref(db,"courses"),courses)
+
+console.log("Courses saved")
+
+}catch(error){
+
+console.log("Firebase save error",error)
+
+}
 
 }
 
 
-// =======================================================
-// حذف مساق
-// =======================================================
+// ===============================
+// تسجيل دخول المشرف
+// ===============================
 
-function deleteCourseFromFirebase(courseKey){
+window.adminLogin = async function(email,password){
 
-    const courseRef = ref(db, "courses/" + courseKey);
+try{
 
-    remove(courseRef);
+await signInWithEmailAndPassword(auth,email,password)
+
+alert("تم تسجيل الدخول بنجاح")
+
+localStorage.setItem("admin_token","authenticated")
+
+}catch(error){
+
+alert("فشل تسجيل الدخول")
+
+console.log(error)
+
+}
 
 }
 
 
-// =======================================================
-// إضافة مساق
-// =======================================================
+// ===============================
+// تسجيل خروج المشرف
+// ===============================
 
-function addCourseToFirebase(courseKey, courseData){
+window.adminLogout = function(){
 
-    const courseRef = ref(db, "courses/" + courseKey);
+signOut(auth)
 
-    set(courseRef, courseData);
-
-}
-
-
-// =======================================================
-// تحديث مساق
-// =======================================================
-
-function updateCourseInFirebase(courseKey, data){
-
-    const courseRef = ref(db, "courses/" + courseKey);
-
-    update(courseRef, data);
+localStorage.removeItem("admin_token")
 
 }
 
 
-// =======================================================
-// تصدير الدوال
-// =======================================================
+// ===============================
+// التحقق من حالة تسجيل الدخول
+// ===============================
 
-window.firebaseDB = db;
+onAuthStateChanged(auth,(user)=>{
 
-window.loadCoursesFromFirebase = loadCoursesFromFirebase;
-window.saveCoursesToFirebase = saveCoursesToFirebase;
-window.deleteCourseFromFirebase = deleteCourseFromFirebase;
-window.addCourseToFirebase = addCourseToFirebase;
-window.updateCourseInFirebase = updateCourseInFirebase;
+if(user){
 
+console.log("Admin logged in")
 
-// تحميل البيانات تلقائياً
-loadCoursesFromFirebase();
+window.isAdmin = true
+
+}else{
+
+console.log("Admin logged out")
+
+window.isAdmin = false
+
+}
+
+})
