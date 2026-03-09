@@ -45,7 +45,9 @@ measurementId: "G-0NVHHTN17D"
 // =============================
 
 const app = initializeApp(firebaseConfig)
+
 const db = getDatabase(app)
+
 const auth = getAuth(app)
 
 
@@ -54,8 +56,9 @@ const auth = getAuth(app)
 window.db = db
 
 
+
 // =============================
-// تحميل المساقات (Realtime)
+// تحميل المساقات (مع الدمج)
 // =============================
 
 window.loadCoursesFromFirebase = function(){
@@ -64,14 +67,18 @@ const coursesRef = ref(db,"courses")
 
 onValue(coursesRef,(snapshot)=>{
 
+let firebaseData = {}
+
 if(snapshot.exists()){
 
-window.firebaseCourses = snapshot.val()
+firebaseData = snapshot.val()
 
-}else{
+}
 
-window.firebaseCourses = {}
-
+// دمج Firebase مع المساقات الافتراضية
+window.firebaseCourses = {
+...defaultCourses,
+...firebaseData
 }
 
 if(window.refreshCourses){
@@ -83,6 +90,7 @@ window.refreshCourses()
 })
 
 }
+
 
 
 // =============================
@@ -106,6 +114,7 @@ console.log("Error adding course",e)
 }
 
 
+
 // =============================
 // حذف مساق
 // =============================
@@ -125,6 +134,7 @@ console.log("Error deleting course",e)
 }
 
 }
+
 
 
 // =============================
@@ -148,6 +158,7 @@ console.log("Update error",e)
 }
 
 
+
 // =============================
 // إضافة كتاب لمساق
 // =============================
@@ -167,6 +178,7 @@ console.log("Book error",e)
 }
 
 }
+
 
 
 // =============================
@@ -190,6 +202,7 @@ console.log("Delete book error",e)
 }
 
 
+
 // =============================
 // تسجيل دخول المشرف
 // =============================
@@ -206,13 +219,14 @@ alert("تم تسجيل الدخول بنجاح")
 
 }catch(e){
 
-alert("خطأ في تسجيل الدخول")
+alert("فشل تسجيل الدخول")
 
 console.log(e)
 
 }
 
 }
+
 
 
 // =============================
@@ -230,8 +244,9 @@ alert("تم تسجيل الخروج")
 }
 
 
+
 // =============================
-// مراقبة حالة الأدمن
+// مراقبة حالة تسجيل الدخول
 // =============================
 
 onAuthStateChanged(auth,(user)=>{
@@ -249,6 +264,7 @@ console.log("Admin logged out")
 }
 
 })
+
 
 
 // =============================
