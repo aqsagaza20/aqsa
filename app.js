@@ -1671,36 +1671,49 @@ const AdminSystem = {
      */
     login() {
 
-const password = document.getElementById('admin-password')?.value;
+    const password = document.getElementById('admin-password')?.value;
 
-if (!password) {
-    alert('❌ الرجاء إدخال كلمة المرور');
-    return;
-}
+    if (!password) {
+        alert('❌ الرجاء إدخال كلمة المرور');
+        return;
+    }
 
-if (window.adminLogin) {
+    if (window.adminLogin) {
 
-window.adminLogin("admin@nursing.com", password);
+        window.adminLogin("admin@nursing.com", password);
 
-this.isLoggedIn = true;
-localStorage.setItem('admin_token', 'authenticated');
+        this.isLoggedIn = true;
+        localStorage.setItem('admin_token', 'authenticated');
 
-this.closeLogin();
-this.showAdminPanel();
+        this.closeLogin();
+        this.showAdminPanel();
 
-NotificationSystem.showNotification({
-    title: '✅ مرحباً بك',
-    message: 'تم تسجيل الدخول بنجاح',
-    type: 'success'
-});
+        NotificationSystem.showNotification({
+            title: '✅ مرحباً بك',
+            message: 'تم تسجيل الدخول بنجاح',
+            type: 'success'
+        });
 
-} else {
+    } else {
 
-alert('❌ نظام تسجيل الدخول غير متصل');
+        alert('❌ نظام تسجيل الدخول غير متصل');
 
-}
+    }
 
-}
+},   // ← هذه الفاصلة هي سبب المشكلة
+
+logout() {
+
+    this.isLoggedIn = false;
+    localStorage.removeItem('admin_token');
+    this.closePanel();
+
+    NotificationSystem.showNotification({
+        message: 'تم تسجيل الخروج',
+        type: 'info'
+    });
+
+},
     
     /**
      * تسجيل الخروج
