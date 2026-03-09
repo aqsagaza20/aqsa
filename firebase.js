@@ -1,10 +1,15 @@
-// ===============================
-// Firebase Setup
-// ===============================
+// =============================
+// Firebase Imports
+// =============================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+import {
+getDatabase,
+ref,
+set,
+onValue
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
 
 import {
 getAuth,
@@ -14,9 +19,9 @@ onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 
-// ===============================
+// =============================
 // Firebase Config
-// ===============================
+// =============================
 
 const firebaseConfig = {
 
@@ -39,45 +44,48 @@ measurementId: "G-0NVHHTN17D"
 };
 
 
-// ===============================
+// =============================
 // Initialize Firebase
-// ===============================
+// =============================
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig)
 
-const db = getDatabase(app);
+const db = getDatabase(app)
 
-const auth = getAuth(app);
+const auth = getAuth(app)
 
 
-// ===============================
-// تحميل المساقات من Firebase
-// ===============================
+// =============================
+// تحميل المساقات بشكل مباشر
+// =============================
 
-window.loadCoursesFromFirebase = async function(){
+window.loadCoursesFromFirebase = function(){
 
-try{
+const coursesRef = ref(db,"courses")
 
-const snapshot = await get(ref(db,"courses"))
+onValue(coursesRef,(snapshot)=>{
 
 if(snapshot.exists()){
 
 window.firebaseCourses = snapshot.val()
 
-}
+// تحديث الموقع
+if(window.refreshCourses){
 
-}catch(error){
-
-console.log("Firebase load error",error)
-
-}
+window.refreshCourses()
 
 }
 
+}
 
-// ===============================
-// حفظ المساقات في Firebase
-// ===============================
+})
+
+}
+
+
+// =============================
+// حفظ المساقات
+// =============================
 
 window.saveCoursesToFirebase = async function(courses){
 
@@ -85,20 +93,20 @@ try{
 
 await set(ref(db,"courses"),courses)
 
-console.log("Courses saved")
+console.log("Courses updated")
 
 }catch(error){
 
-console.log("Firebase save error",error)
+console.log("Firebase error",error)
 
 }
 
 }
 
 
-// ===============================
+// =============================
 // تسجيل دخول المشرف
-// ===============================
+// =============================
 
 window.adminLogin = async function(email,password){
 
@@ -121,9 +129,9 @@ console.log(error)
 }
 
 
-// ===============================
+// =============================
 // تسجيل خروج المشرف
-// ===============================
+// =============================
 
 window.adminLogout = function(){
 
@@ -134,9 +142,9 @@ localStorage.removeItem("admin_token")
 }
 
 
-// ===============================
+// =============================
 // التحقق من حالة تسجيل الدخول
-// ===============================
+// =============================
 
 onAuthStateChanged(auth,(user)=>{
 
