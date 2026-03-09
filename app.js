@@ -42,7 +42,7 @@ let userSession = {
     firstVisit: new Date().toISOString(),
     lastVisit: new Date().toISOString(),
     userAgent: navigator.userAgent,
-    screenSize: `${window.screen.width}x${window.screen.height}`,
+    screenSize: window.screen.width + "x" + window.screen.height,
     language: navigator.language || 'ar',
     deviceType: 'unknown'
 };
