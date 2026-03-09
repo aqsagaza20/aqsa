@@ -1,6 +1,6 @@
+```javascript
 // ============================================================================
 // جامعة الأقصى - كلية التمريض
-
 // ============================================================================
 
 // ============================================================================
@@ -461,13 +461,11 @@ const icons = {
     warning: "fa-exclamation-triangle",
     sync: "fa-sync-alt",
     trash: "fa-trash",
-    download: "fa-download",
     upload: "fa-upload",
     filter: "fa-filter",
     sort: "fa-sort",
     eye: "fa-eye",
     eye_slash: "fa-eye-slash",
-    heart: "fa-heart",
     heart_broken: "fa-heart-broken",
     bell: "fa-bell",
     bell_slash: "fa-bell-slash",
@@ -483,13 +481,11 @@ const icons = {
     image: "fa-image",
     images: "fa-images",
     file: "fa-file",
-    file_alt: "fa-file-alt",
     file_archive: "fa-file-archive",
     file_audio: "fa-file-audio",
     file_code: "fa-file-code",
     file_excel: "fa-file-excel",
     file_image: "fa-file-image",
-    file_pdf: "fa-file-pdf",
     file_powerpoint: "fa-file-powerpoint",
     file_video: "fa-file-video",
     file_word: "fa-file-word",
@@ -497,25 +493,22 @@ const icons = {
     folder_open: "fa-folder-open",
     folder_plus: "fa-folder-plus",
     folder_minus: "fa-folder-minus",
-    trash: "fa-trash",
     trash_restore: "fa-trash-restore",
     history: "fa-history",
     undo: "fa-undo",
     redo: "fa-redo",
-    sync: "fa-sync",
     spinner: "fa-spinner",
     circle: "fa-circle",
     dot_circle: "fa-dot-circle",
     square: "fa-square",
     check_square: "fa-check-square",
-    times_square: "fa-times-circle",
+    times_circle: "fa-times-circle",
     info_circle: "fa-info-circle",
     exclamation_circle: "fa-exclamation-circle",
     exclamation_triangle: "fa-exclamation-triangle",
     question_circle: "fa-question-circle",
     plus_circle: "fa-plus-circle",
     minus_circle: "fa-minus-circle",
-    times_circle: "fa-times-circle",
     check_circle: "fa-check-circle"
 };
 
@@ -534,44 +527,25 @@ if (window.firebaseCourses) {
 /**
  * حفظ المساقات في localStorage
  */
-/**
- * حفظ المساقات في localStorage
- */
 function saveCourses() {
-
     if (window.saveCoursesToFirebase) {
         saveCoursesToFirebase(courses);
     }
-
 }
-
-
-// دالة تحميل المساقات من Firebase
-/**
- * حفظ المساقات في localStorage
- */
-
-
 
 // دالة تحميل المساقات من Firebase
 function loadCourses() {
-
     if (window.loadCoursesFromFirebase) {
-
-        window.loadCoursesFromFirebase()
-
+        window.loadCoursesFromFirebase();
     } else {
-
-        courses = JSON.parse(JSON.stringify(defaultCourses))
-
-        SearchSystem.buildCache()
-
+        courses = JSON.parse(JSON.stringify(defaultCourses));
+        SearchSystem.buildCache();
     }
-
 }
 
 // تحميل المساقات
 loadCourses();
+
 // ============================================================================
 // 3. نظام المفضلة المتكامل (محسّن جداً)
 // ============================================================================
@@ -1305,95 +1279,91 @@ const NotificationSystem = {
      * عرض إشعار
      */
     showNotification(options) {
-
-    const { title, message, type = 'info', duration = 5000 } = options;
-
-    const icons = {
-        info: 'fa-info-circle',
-        success: 'fa-check-circle',
-        warning: 'fa-exclamation-triangle',
-        error: 'fa-times-circle'
-    };
-
-    const colors = {
-        info: 'var(--primary-color)',
-        success: 'var(--success)',
-        warning: 'var(--warning)',
-        error: 'var(--danger)'
-    };
-
-    const notification = document.createElement('div');
-
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-80px);
-        background: ${colors[type]};
-        color: white;
-        padding: 15px 30px;
-        border-radius: 20px;
-        box-shadow: var(--shadow-lg);
-        z-index: 10001;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        font-size: 1rem;
-        border: 2px solid var(--gold);
-        direction: rtl;
-        max-width: 90%;
-        transition: transform 0.4s ease, opacity 0.4s ease;
-        opacity: 0;
-    `;
-
-    notification.innerHTML = `
-        <i class="fas ${icons[type]}" style="font-size:1.3rem"></i>
-        <div>
-            ${title ? `<strong>${title}</strong><br>` : ''}
-            <span>${message}</span>
-        </div>
-        <button onclick="this.parentElement.remove()" style="
-            background:none;
-            border:none;
-            color:white;
-            cursor:pointer;
-            font-size:1.2rem;
-        ">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-
-    document.body.appendChild(notification);
-
-    // حركة الدخول
-    setTimeout(() => {
-        notification.style.transform = "translateX(-50%) translateY(0)";
-        notification.style.opacity = "1";
-    }, 50);
-
-    // صوت الإشعار
-    try {
-        const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3");
-        audio.volume = 0.4;
-        audio.play();
-    } catch (e) {}
-
-    // الاختفاء
-    setTimeout(() => {
-
-        notification.style.transform = "translateX(-50%) translateY(-80px)";
-        notification.style.opacity = "0";
-
+        const { title, message, type = 'info', duration = 5000 } = options;
+        
+        const icons = {
+            info: 'fa-info-circle',
+            success: 'fa-check-circle',
+            warning: 'fa-exclamation-triangle',
+            error: 'fa-times-circle'
+        };
+        
+        const colors = {
+            info: 'var(--primary-color)',
+            success: 'var(--success)',
+            warning: 'var(--warning)',
+            error: 'var(--danger)'
+        };
+        
+        const notification = document.createElement('div');
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: ${colors[type]};
+            color: white;
+            padding: 15px 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1rem;
+            border: 2px solid var(--gold);
+            direction: rtl;
+            max-width: 90%;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            opacity: 0;
+        `;
+        
+        notification.innerHTML = `
+            <i class="fas ${icons[type]}" style="font-size:1.3rem"></i>
+            <div>
+                ${title ? `<strong>${title}</strong><br>` : ''}
+                <span>${message}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" style="
+                background:none;
+                border:none;
+                color:white;
+                cursor:pointer;
+                font-size:1.2rem;
+            ">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // حركة الدخول
         setTimeout(() => {
-            if (notification.parentNode) {
-                notification.remove();
-            }
-        }, 400);
-
-    }, duration);
-
-},
-}; 
+            notification.style.transform = "translateX(-50%) translateY(0)";
+            notification.style.opacity = "1";
+        }, 50);
+        
+        // صوت الإشعار
+        try {
+            const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3");
+            audio.volume = 0.4;
+            audio.play();
+        } catch (e) {}
+        
+        // الاختفاء
+        setTimeout(() => {
+            notification.style.transform = "translateX(-50%) translateY(-80px)";
+            notification.style.opacity = "0";
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 400);
+        }, duration);
+    }
+};
 
 // تهيئة نظام الإشعارات
 NotificationSystem.init();
@@ -1670,50 +1640,28 @@ const AdminSystem = {
      * تسجيل الدخول
      */
     login() {
-
-    const password = document.getElementById('admin-password')?.value;
-
-    if (!password) {
-        alert('❌ الرجاء إدخال كلمة المرور');
-        return;
-    }
-
-    if (window.adminLogin) {
-
-        window.adminLogin("admin@nursing.com", password);
-
-        this.isLoggedIn = true;
-        localStorage.setItem('admin_token', 'authenticated');
-
-        this.closeLogin();
-        this.showAdminPanel();
-
-        NotificationSystem.showNotification({
-            title: '✅ مرحباً بك',
-            message: 'تم تسجيل الدخول بنجاح',
-            type: 'success'
-        });
-
-    } else {
-
-        alert('❌ نظام تسجيل الدخول غير متصل');
-
-    }
-
-},   // ← هذه الفاصلة هي سبب المشكلة
-
-logout() {
-
-    this.isLoggedIn = false;
-    localStorage.removeItem('admin_token');
-    this.closePanel();
-
-    NotificationSystem.showNotification({
-        message: 'تم تسجيل الخروج',
-        type: 'info'
-    });
-
-},
+        const password = document.getElementById('admin-password')?.value;
+        
+        if (!password) {
+            alert('❌ الرجاء إدخال كلمة المرور');
+            return;
+        }
+        
+        if (window.adminLogin) {
+            window.adminLogin("admin@nursing.com", password);
+            this.isLoggedIn = true;
+            localStorage.setItem('admin_token', 'authenticated');
+            this.closeLogin();
+            this.showAdminPanel();
+            NotificationSystem.showNotification({
+                title: '✅ مرحباً بك',
+                message: 'تم تسجيل الدخول بنجاح',
+                type: 'success'
+            });
+        } else {
+            alert('❌ نظام تسجيل الدخول غير متصل');
+        }
+    },
     
     /**
      * تسجيل الخروج
@@ -1732,94 +1680,63 @@ logout() {
     /**
      * حذف مساق
      */
-    async deleteCourse(key){
-
-    if(confirm("هل تريد حذف المساق؟")){
-
-        if(window.deleteCourseFromFirebase){
-            await window.deleteCourseFromFirebase(key)
+    async deleteCourse(key) {
+        if (confirm("هل تريد حذف المساق؟")) {
+            if (window.deleteCourseFromFirebase) {
+                await window.deleteCourseFromFirebase(key);
+            }
+            
+            NotificationSystem.showNotification({
+                message: "تم حذف المساق",
+                type: "success"
+            });
+            
+            setTimeout(() => {
+                handleHashChange();
+            }, 500);
         }
-
-        NotificationSystem.showNotification({
-            message:"تم حذف المساق",
-            type:"success"
-        })
-
-        setTimeout(()=>{
-            handleHashChange()
-        },500)
-
-    }
-
-}
+    },
     
     /**
      * حذف اختبار
      */
-    deleteCourse(key){
-
-    if(confirm("هل تريد حذف المساق؟")){
-
-        if(window.deleteCourseFromFirebase){
-            await window.deleteCourseFromFirebase(key)
+    deleteExam(examId) {
+        if (confirm("هل أنت متأكد من حذف هذا الاختبار؟")) {
+            ExamAlertSystem.removeExam(examId);
+            this.refreshStats();
+            
+            NotificationSystem.showNotification({
+                message: "تم حذف الاختبار بنجاح",
+                type: "success"
+            });
         }
-
-        NotificationSystem.showNotification({
-            message:"تم حذف المساق",
-            type:"success"
-        })
-
-        setTimeout(()=>{
-            handleHashChange()
-        },500)
-
-    }
-
-},   // ← هذه الفاصلة ضرورية
-
-deleteExam(examId) {
-
-    if (confirm("هل أنت متأكد من حذف هذا الاختبار؟")) {
-
-        ExamAlertSystem.removeExam(examId)
-        this.refreshStats()
-
-        NotificationSystem.showNotification({
-            message:"تم حذف الاختبار بنجاح",
-            type:"success"
-        })
-
-    }
-
-},
+    },
     
     /**
      * عرض نموذج إضافة مساق
      */
-    showAddCourseForm(){
-
-    const title = prompt("اسم المساق")
-
-    if(!title) return;
-
-    const key = title.replace(/\s+/g,"_").toLowerCase()
-
-    const course = {
-        title:title,
-        icon:"fa-book",
-        code:"NEW",
-        semester:1,
-        books:[],
-        lectures:[],
-        summaries:[],
-        exams:[]
-    }
-
-    if(window.addCourseToFirebase){
-        window.addCourseToFirebase(key,course)
-    }
-
-}
+    showAddCourseForm() {
+        const title = prompt("اسم المساق");
+        if (!title) return;
+        
+        const key = title.replace(/\s+/g, "_").toLowerCase();
+        
+        const course = {
+            title: title,
+            icon: "fa-book",
+            code: "NEW",
+            semester: 1,
+            books: [],
+            lectures: [],
+            summaries: [],
+            exams: []
+        };
+        
+        if (window.addCourseToFirebase) {
+            window.addCourseToFirebase(key, course);
+        }
+    },
+    
     /**
      * عرض نموذج إضافة اختبار
      */
@@ -2875,23 +2792,22 @@ function initApp() {
 window.FavoritesSystem = FavoritesSystem;
 window.AdminSystem = AdminSystem;
 window.handleSearchInput = handleSearchInput;
-window.refreshCourses = function(){
-
-    if(window.firebaseCourses){
-
-        courses = window.firebaseCourses
-
-        localStorage.setItem("courses_backup", JSON.stringify(courses))
-
-        SearchSystem.buildCache()
-        FavoritesSystem.renderStars()
-
-        handleHashChange()
-
+window.refreshCourses = function() {
+    if (window.firebaseCourses) {
+        courses = window.firebaseCourses;
+        localStorage.setItem("courses_backup", JSON.stringify(courses));
+        SearchSystem.buildCache();
+        FavoritesSystem.renderStars();
+        handleHashChange();
     }
+};
 
-}
-SearchSystem.buildCache()
+// بناء كاش البحث
+SearchSystem.buildCache();
+
+// بدء التطبيق
+initApp();
 // ============================================================================
-//  1111
+// نهاية الكود
 // ============================================================================
+```
