@@ -8,7 +8,9 @@ import {
 getDatabase,
 ref,
 set,
-onValue
+onValue,
+remove,
+push
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
 
 import {
@@ -55,6 +57,15 @@ const db = getDatabase(app)
 const auth = getAuth(app)
 
 
+// جعل الدوال متاحة لباقي الموقع
+
+window.db = db
+window.ref = ref
+window.set = set
+window.remove = remove
+window.push = push
+
+
 // =============================
 // تحميل المساقات بشكل مباشر
 // =============================
@@ -69,7 +80,6 @@ if(snapshot.exists()){
 
 window.firebaseCourses = snapshot.val()
 
-// تحديث الموقع
 if(window.refreshCourses){
 
 window.refreshCourses()
@@ -164,37 +174,35 @@ window.isAdmin = false
 
 })
 
-// إضافة مساق جديد
+
+// =============================
+// إضافة مساق
+// =============================
+
 window.addCourseToFirebase = async function(courseKey, courseData){
 
-    const db = window.db
-    const ref = window.ref
-    const set = window.set
-
-    await set(ref(db, "courses/" + courseKey), courseData)
+await set(ref(db, "courses/" + courseKey), courseData)
 
 }
 
 
+// =============================
 // حذف مساق
+// =============================
+
 window.deleteCourseFromFirebase = async function(courseKey){
 
-    const db = window.db
-    const ref = window.ref
-    const remove = window.remove
-
-    await remove(ref(db, "courses/" + courseKey))
+await remove(ref(db, "courses/" + courseKey))
 
 }
 
 
+// =============================
 // إضافة كتاب
+// =============================
+
 window.addBookToCourse = async function(courseKey, book){
 
-    const db = window.db
-    const ref = window.ref
-    const push = window.push
-
-    await push(ref(db, "courses/" + courseKey + "/books"), book)
+await push(ref(db, "courses/" + courseKey + "/books"), book)
 
 }
