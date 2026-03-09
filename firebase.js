@@ -10,7 +10,8 @@ ref,
 set,
 onValue,
 remove,
-push
+push,
+update
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
 
 import {
@@ -28,19 +29,12 @@ onAuthStateChanged
 const firebaseConfig = {
 
 apiKey: "AIzaSyD70tZ67zeIARlOzOfP4zALbPjfmef31E8",
-
 authDomain: "nader-c1691.firebaseapp.com",
-
 databaseURL: "https://nader-c1691-default-rtdb.firebaseio.com",
-
 projectId: "nader-c1691",
-
 storageBucket: "nader-c1691.firebasestorage.app",
-
 messagingSenderId: "455340592959",
-
 appId: "1:455340592959:web:796eb55b96d0f4b0690d8a",
-
 measurementId: "G-0NVHHTN17D"
 
 };
@@ -51,23 +45,17 @@ measurementId: "G-0NVHHTN17D"
 // =============================
 
 const app = initializeApp(firebaseConfig)
-
 const db = getDatabase(app)
-
 const auth = getAuth(app)
 
 
 // جعل الدوال متاحة لباقي الموقع
 
 window.db = db
-window.ref = ref
-window.set = set
-window.remove = remove
-window.push = push
 
 
 // =============================
-// تحميل المساقات بشكل مباشر
+// تحميل المساقات (Realtime)
 // =============================
 
 window.loadCoursesFromFirebase = function(){
@@ -80,11 +68,15 @@ if(snapshot.exists()){
 
 window.firebaseCourses = snapshot.val()
 
+}else{
+
+window.firebaseCourses = {}
+
+}
+
 if(window.refreshCourses){
 
 window.refreshCourses()
-
-}
 
 }
 
@@ -94,20 +86,104 @@ window.refreshCourses()
 
 
 // =============================
-// حفظ المساقات
+// إضافة مساق
 // =============================
 
-window.saveCoursesToFirebase = async function(courses){
+window.addCourseToFirebase = async function(courseKey,courseData){
 
 try{
 
-await set(ref(db,"courses"),courses)
+await set(ref(db,"courses/"+courseKey),courseData)
 
-console.log("Courses updated")
+console.log("Course added")
 
-}catch(error){
+}catch(e){
 
-console.log("Firebase error",error)
+console.log("Error adding course",e)
+
+}
+
+}
+
+
+// =============================
+// حذف مساق
+// =============================
+
+window.deleteCourseFromFirebase = async function(courseKey){
+
+try{
+
+await remove(ref(db,"courses/"+courseKey))
+
+console.log("Course deleted")
+
+}catch(e){
+
+console.log("Error deleting course",e)
+
+}
+
+}
+
+
+// =============================
+// تعديل مساق
+// =============================
+
+window.updateCourseInFirebase = async function(courseKey,data){
+
+try{
+
+await update(ref(db,"courses/"+courseKey),data)
+
+console.log("Course updated")
+
+}catch(e){
+
+console.log("Update error",e)
+
+}
+
+}
+
+
+// =============================
+// إضافة كتاب لمساق
+// =============================
+
+window.addBookToCourse = async function(courseKey,book){
+
+try{
+
+await push(ref(db,"courses/"+courseKey+"/books"),book)
+
+console.log("Book added")
+
+}catch(e){
+
+console.log("Book error",e)
+
+}
+
+}
+
+
+// =============================
+// حذف كتاب
+// =============================
+
+window.deleteBookFromCourse = async function(courseKey,bookId){
+
+try{
+
+await remove(ref(db,"courses/"+courseKey+"/books/"+bookId))
+
+console.log("Book deleted")
+
+}catch(e){
+
+console.log("Delete book error",e)
 
 }
 
@@ -124,15 +200,15 @@ try{
 
 await signInWithEmailAndPassword(auth,email,password)
 
-alert("تم تسجيل الدخول بنجاح")
-
 localStorage.setItem("admin_token","authenticated")
 
-}catch(error){
+alert("تم تسجيل الدخول بنجاح")
 
-alert("فشل تسجيل الدخول")
+}catch(e){
 
-console.log(error)
+alert("خطأ في تسجيل الدخول")
+
+console.log(e)
 
 }
 
@@ -149,26 +225,26 @@ signOut(auth)
 
 localStorage.removeItem("admin_token")
 
+alert("تم تسجيل الخروج")
+
 }
 
 
 // =============================
-// التحقق من حالة تسجيل الدخول
+// مراقبة حالة الأدمن
 // =============================
 
 onAuthStateChanged(auth,(user)=>{
 
 if(user){
 
-console.log("Admin logged in")
-
 window.isAdmin = true
+console.log("Admin logged in")
 
 }else{
 
-console.log("Admin logged out")
-
 window.isAdmin = false
+console.log("Admin logged out")
 
 }
 
@@ -176,33 +252,7 @@ window.isAdmin = false
 
 
 // =============================
-// إضافة مساق
+// تشغيل تحميل المساقات
 // =============================
 
-window.addCourseToFirebase = async function(courseKey, courseData){
-
-await set(ref(db, "courses/" + courseKey), courseData)
-
-}
-
-
-// =============================
-// حذف مساق
-// =============================
-
-window.deleteCourseFromFirebase = async function(courseKey){
-
-await remove(ref(db, "courses/" + courseKey))
-
-}
-
-
-// =============================
-// إضافة كتاب
-// =============================
-
-window.addBookToCourse = async function(courseKey, book){
-
-await push(ref(db, "courses/" + courseKey + "/books"), book)
-
-}
+window.loadCoursesFromFirebase()
