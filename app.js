@@ -1,4 +1,3 @@
-```javascript
 // ============================================================================
 // جامعة الأقصى - كلية التمريض
 // ============================================================================
@@ -42,7 +41,7 @@ let userSession = {
     firstVisit: new Date().toISOString(),
     lastVisit: new Date().toISOString(),
     userAgent: navigator.userAgent,
-    screenSize: window.screen.width + "x" + window.screen.height,
+    screenSize: window.screen.width + "x" + window.screen.height, // تم الإصلاح
     language: navigator.language || 'ar',
     deviceType: 'unknown'
 };
@@ -539,7 +538,9 @@ function loadCourses() {
         window.loadCoursesFromFirebase();
     } else {
         courses = JSON.parse(JSON.stringify(defaultCourses));
-        SearchSystem.buildCache();
+        if (courses && Object.keys(courses).length > 0) { // تم الإصلاح
+            SearchSystem.buildCache();
+        }
     }
 }
 
@@ -765,7 +766,7 @@ const StatisticsSystem = {
      */
     async getTotalVisitors() {
         try {
-            // استخدام CountAPI للحصول على عدد زوار حقيقي
+            // استخدام CountAPI للحصول على عدد زوار حقيقي - استخدام get فقط (تم الإصلاح)
             const response = await fetch('https://api.countapi.xyz/get/university-aqsa/visitors');
             const data = await response.json();
             return data.value || 0;
@@ -823,6 +824,10 @@ const SearchSystem = {
      * بناء كاش البحث
      */
     buildCache() {
+        if (!courses || Object.keys(courses).length === 0) { // تم الإصلاح
+            return;
+        }
+        
         this.cache = {};
         
         Object.keys(courses).forEach(key => {
@@ -1006,8 +1011,10 @@ const SearchSystem = {
     }
 };
 
-// بناء كاش البحث
-SearchSystem.buildCache();
+// بناء كاش البحث (مع التحقق)
+if (courses && Object.keys(courses).length > 0) { // تم الإصلاح
+    SearchSystem.buildCache();
+}
 
 // ============================================================================
 // 6. نظام تنبيه الاختبارات المتقدم
@@ -1344,11 +1351,11 @@ const NotificationSystem = {
             notification.style.opacity = "1";
         }, 50);
         
-        // صوت الإشعار
+        // صوت الإشعار (اختياري)
         try {
             const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3");
             audio.volume = 0.4;
-            audio.play();
+            audio.play().catch(() => {}); // تجاهل أخطاء الصوت
         } catch (e) {}
         
         // الاختفاء
@@ -1686,6 +1693,14 @@ const AdminSystem = {
                 await window.deleteCourseFromFirebase(key);
             }
             
+            // حذف من الكائن المحلي أيضاً
+            delete courses[key];
+            
+            // إعادة بناء كاش البحث
+            if (courses && Object.keys(courses).length > 0) {
+                SearchSystem.buildCache();
+            }
+            
             NotificationSystem.showNotification({
                 message: "تم حذف المساق",
                 type: "success"
@@ -1735,13 +1750,29 @@ const AdminSystem = {
         if (window.addCourseToFirebase) {
             window.addCourseToFirebase(key, course);
         }
+        
+        // إضافة للكائن المحلي أيضاً
+        courses[key] = course;
+        
+        // إعادة بناء كاش البحث
+        if (courses && Object.keys(courses).length > 0) {
+            SearchSystem.buildCache();
+        }
+        
+        NotificationSystem.showNotification({
+            message: "تم إضافة المساق بنجاح",
+            type: "success"
+        });
+        
+        setTimeout(() => {
+            handleHashChange();
+        }, 500);
     },
     
     /**
      * عرض نموذج إضافة اختبار
      */
     showAddExamForm() {
-        // تنفيذ نموذج إضافة اختبار
         alert('نموذج إضافة اختبار - قيد التطوير');
     },
     
@@ -2582,9 +2613,9 @@ function handleHashChange() {
             showNotFound();
         }
     } else if (hash.startsWith('course-')) {
-        const parts = hash.split('-');
+        const parts = hash.split("-");
         const courseKey = parts[1];
-        const tab = parts[2] || 'books';
+        const tab = parts.slice(2).join("-") || "books"; // تم الإصلاح
         
         if (courses[courseKey]) {
             showCourse(courseKey, tab);
@@ -2648,10 +2679,7 @@ function handleSearchInput(value) {
 
 async function updateVisitorCounter() {
     try {
-        // زيادة العداد
-        await fetch('https://api.countapi.xyz/hit/university-aqsa/visitors');
-        
-        // قراءة العداد
+        // قراءة العداد فقط (تم الإصلاح)
         const response = await fetch('https://api.countapi.xyz/get/university-aqsa/visitors');
         const data = await response.json();
         
@@ -2659,7 +2687,7 @@ async function updateVisitorCounter() {
         if (counter) {
             counter.innerHTML = `
                 <i class="fas fa-users" style="color: var(--primary-color);"></i>
-                <span>عدد الزوار: ${data.value.toLocaleString()}</span>
+                <span>عدد الزوار: ${data.value ? data.value.toLocaleString() : '0'}</span>
             `;
         }
     } catch (e) {
@@ -2731,26 +2759,18 @@ function createAppStructure() {
 }
 
 // ============================================================================
-// 14. نظام حماية بسيط
+// 14. نظام حماية بسيط (تم إزالة منع النقر بالزر الأيمن)
 // ============================================================================
 
-(function() {
-    // منع النقر بالزر الأيمن
-    document.addEventListener('contextmenu', function(e) {
+// منع اختصارات معينة فقط
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+        (e.ctrlKey && e.key === 'u')) {
         e.preventDefault();
         return false;
-    });
-
-    // منع اختصارات معينة
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-            (e.ctrlKey && e.key === 'u')) {
-            e.preventDefault();
-            return false;
-        }
-    });
-})();
+    }
+});
 
 // ============================================================================
 // 15. PWA و Service Worker
@@ -2796,18 +2816,22 @@ window.refreshCourses = function() {
     if (window.firebaseCourses) {
         courses = window.firebaseCourses;
         localStorage.setItem("courses_backup", JSON.stringify(courses));
-        SearchSystem.buildCache();
+        if (courses && Object.keys(courses).length > 0) {
+            SearchSystem.buildCache();
+        }
         FavoritesSystem.renderStars();
         handleHashChange();
     }
 };
 
-// بناء كاش البحث
-SearchSystem.buildCache();
+// بناء كاش البحث (مع التحقق)
+if (courses && Object.keys(courses).length > 0) {
+    SearchSystem.buildCache();
+}
 
 // بدء التطبيق
 initApp();
+
 // ============================================================================
 // نهاية الكود
 // ============================================================================
-```
