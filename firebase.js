@@ -1,8 +1,17 @@
-// استيراد مكتبات Firebase
+// استيراد Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+import { 
+  getDatabase, 
+  ref, 
+  set, 
+  get, 
+  onValue, 
+  remove, 
+  update 
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
 
-// إعدادات مشروع Firebase الخاص بك
+
+// إعدادات مشروعك
 const firebaseConfig = {
   apiKey: "AIzaSyD70tZ67zeIARlOzOfP4zALbPjfmef31E8",
   authDomain: "nader-c1691.firebaseapp.com",
@@ -14,20 +23,107 @@ const firebaseConfig = {
   measurementId: "G-0NVHHTN17D"
 };
 
+
 // تشغيل Firebase
 const app = initializeApp(firebaseConfig);
-
-// الاتصال بقاعدة البيانات
 const db = getDatabase(app);
 
-// قراءة المساقات من Firebase
-const coursesRef = ref(db, "courses");
 
-onValue(coursesRef, (snapshot) => {
-    const courses = snapshot.val();
+// =======================================================
+// تحميل المساقات من Firebase
+// =======================================================
 
-    console.log("Courses loaded from Firebase:", courses);
+function loadCoursesFromFirebase() {
 
-    // جعل البيانات متاحة لباقي الموقع
-    window.firebaseCourses = courses;
-});
+    const coursesRef = ref(db, "courses");
+
+    onValue(coursesRef, (snapshot) => {
+
+        const data = snapshot.val();
+
+        if (data) {
+            console.log("تم تحميل المساقات من Firebase");
+
+            window.courses = data;
+
+            if (typeof SearchSystem !== "undefined") {
+                SearchSystem.buildCache();
+            }
+
+            if (typeof handleHashChange !== "undefined") {
+                handleHashChange();
+            }
+        }
+
+    });
+
+}
+
+
+// =======================================================
+// حفظ المساقات إلى Firebase
+// =======================================================
+
+function saveCoursesToFirebase(courses) {
+
+    const coursesRef = ref(db, "courses");
+
+    set(coursesRef, courses);
+
+}
+
+
+// =======================================================
+// حذف مساق
+// =======================================================
+
+function deleteCourseFromFirebase(courseKey){
+
+    const courseRef = ref(db, "courses/" + courseKey);
+
+    remove(courseRef);
+
+}
+
+
+// =======================================================
+// إضافة مساق
+// =======================================================
+
+function addCourseToFirebase(courseKey, courseData){
+
+    const courseRef = ref(db, "courses/" + courseKey);
+
+    set(courseRef, courseData);
+
+}
+
+
+// =======================================================
+// تحديث مساق
+// =======================================================
+
+function updateCourseInFirebase(courseKey, data){
+
+    const courseRef = ref(db, "courses/" + courseKey);
+
+    update(courseRef, data);
+
+}
+
+
+// =======================================================
+// تصدير الدوال
+// =======================================================
+
+window.firebaseDB = db;
+
+window.loadCoursesFromFirebase = loadCoursesFromFirebase;
+window.saveCoursesToFirebase = saveCoursesToFirebase;
+window.deleteCourseFromFirebase = deleteCourseFromFirebase;
+window.addCourseToFirebase = addCourseToFirebase;
+window.updateCourseInFirebase = updateCourseInFirebase;
+
+
+// تحميل البيانات تلقائياً
+loadCoursesFromFirebase();
