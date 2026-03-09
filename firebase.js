@@ -163,3 +163,38 @@ window.isAdmin = false
 }
 
 })
+
+// إضافة مساق جديد
+window.addCourseToFirebase = async function(courseKey, courseData){
+
+    const db = window.db
+    const ref = window.ref
+    const set = window.set
+
+    await set(ref(db, "courses/" + courseKey), courseData)
+
+}
+
+
+// حذف مساق
+window.deleteCourseFromFirebase = async function(courseKey){
+
+    const db = window.db
+    const ref = window.ref
+    const remove = window.remove
+
+    await remove(ref(db, "courses/" + courseKey))
+
+}
+
+
+// إضافة كتاب
+window.addBookToCourse = async function(courseKey, book){
+
+    const db = window.db
+    const ref = window.ref
+    const push = window.push
+
+    await push(ref(db, "courses/" + courseKey + "/books"), book)
+
+}
