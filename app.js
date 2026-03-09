@@ -1756,17 +1756,42 @@ logout() {
     /**
      * حذف اختبار
      */
-    deleteExam(examId) {
-        if (confirm('⚠️ هل أنت متأكد من حذف هذا الاختبار؟')) {
-            ExamAlertSystem.removeExam(examId);
-            this.refreshStats();
-            
-            NotificationSystem.showNotification({
-                message: '✅ تم حذف الاختبار بنجاح',
-                type: 'success'
-            });
+    deleteCourse(key){
+
+    if(confirm("هل تريد حذف المساق؟")){
+
+        if(window.deleteCourseFromFirebase){
+            await window.deleteCourseFromFirebase(key)
         }
-    },
+
+        NotificationSystem.showNotification({
+            message:"تم حذف المساق",
+            type:"success"
+        })
+
+        setTimeout(()=>{
+            handleHashChange()
+        },500)
+
+    }
+
+},   // ← هذه الفاصلة ضرورية
+
+deleteExam(examId) {
+
+    if (confirm("هل أنت متأكد من حذف هذا الاختبار؟")) {
+
+        ExamAlertSystem.removeExam(examId)
+        this.refreshStats()
+
+        NotificationSystem.showNotification({
+            message:"تم حذف الاختبار بنجاح",
+            type:"success"
+        })
+
+    }
+
+},
     
     /**
      * عرض نموذج إضافة مساق
