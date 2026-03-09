@@ -1762,7 +1762,7 @@ alert('❌ نظام تسجيل الدخول غير متصل');
 
     const title = prompt("اسم المساق")
 
-    if(!title) return
+    if(!title) return;
 
     const key = title.replace(/\s+/g,"_").toLowerCase()
 
